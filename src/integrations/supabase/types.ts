@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      deadline_notifications: {
+        Row: {
+          days_before: number
+          id: string
+          scheme_id: string
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          days_before: number
+          id?: string
+          scheme_id: string
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          days_before?: number
+          id?: string
+          scheme_id?: string
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deadline_notifications_scheme_id_fkey"
+            columns: ["scheme_id"]
+            isOneToOne: false
+            referencedRelation: "schemes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -192,6 +224,44 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      user_documents: {
+        Row: {
+          document_name: string
+          document_type: string
+          id: string
+          scheme_id: string
+          storage_path: string
+          uploaded_at: string
+          user_id: string
+        }
+        Insert: {
+          document_name: string
+          document_type: string
+          id?: string
+          scheme_id: string
+          storage_path: string
+          uploaded_at?: string
+          user_id: string
+        }
+        Update: {
+          document_name?: string
+          document_type?: string
+          id?: string
+          scheme_id?: string
+          storage_path?: string
+          uploaded_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_documents_scheme_id_fkey"
+            columns: ["scheme_id"]
+            isOneToOne: false
+            referencedRelation: "schemes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
