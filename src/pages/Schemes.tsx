@@ -5,8 +5,10 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { SchemeCard } from '@/components/schemes/SchemeCard';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Search, Filter } from 'lucide-react';
+import { Loader2, Search, Filter, Sparkles } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function SchemesPage() {
   const [loading, setLoading] = useState(true);
@@ -14,6 +16,8 @@ export default function SchemesPage() {
   const [filteredSchemes, setFilteredSchemes] = useState<Scheme[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [ministryFilter, setMinistryFilter] = useState<string>('all');
+  const [fetching, setFetching] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchSchemes();
@@ -61,6 +65,29 @@ export default function SchemesPage() {
     setFilteredSchemes(filtered);
   };
 
+  const fetchWithAI = async () => {
+    setFetching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-schemes');
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({
+        title: 'Schemes Updated',
+        description: `${data.count} new schemes fetched using AI`,
+      });
+      await fetchSchemes();
+    } catch (error: any) {
+      console.error('AI fetch error:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to fetch schemes with AI',
+        variant: 'destructive',
+      });
+    } finally {
+      setFetching(false);
+    }
+  };
+
   const ministries = [...new Set(schemes.map((s) => s.ministry))];
 
   return (
@@ -68,11 +95,21 @@ export default function SchemesPage() {
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Browse Government Schemes</h1>
-          <p className="text-muted-foreground mt-1">
-            Explore all available government schemes and find what you're eligible for
-          </p>
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Browse Government Schemes</h1>
+            <p className="text-muted-foreground mt-1">
+              Explore all available government schemes and find what you're eligible for
+            </p>
+          </div>
+          <Button onClick={fetchWithAI} disabled={fetching} className="shrink-0">
+            {fetching ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4 mr-2" />
+            )}
+            {fetching ? 'Fetching...' : 'Fetch with AI'}
+          </Button>
         </div>
 
         {/* Filters */}
