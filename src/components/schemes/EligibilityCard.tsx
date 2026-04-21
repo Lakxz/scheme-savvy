@@ -6,12 +6,14 @@ import { getDaysUntilExpiry, getExpiryStatus } from '@/lib/eligibility-engine';
 import { CheckCircle2, XCircle, AlertCircle, Clock, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface EligibilityCardProps {
   result: EligibilityResult;
 }
 
 export function EligibilityCard({ result }: EligibilityCardProps) {
+  const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
   const { scheme, isEligible, confidenceScore, reasons, missingCriteria } = result;
 
@@ -25,16 +27,16 @@ export function EligibilityCard({ result }: EligibilityCardProps) {
   };
 
   const getStatusText = () => {
-    if (isEligible) return 'Eligible';
-    if (confidenceScore >= 50) return 'Partially Eligible';
-    return 'Not Eligible';
+    if (isEligible) return t('elig.eligible');
+    if (confidenceScore >= 50) return t('elig.partial');
+    return t('elig.notEligible');
   };
 
   const getExpiryBadge = () => {
-    if (expiryStatus === 'expired') return <Badge variant="destructive">Expired</Badge>;
-    if (expiryStatus === 'urgent') return <Badge variant="destructive" className="animate-pulse"><Clock className="h-3 w-3 mr-1" />{daysUntilExpiry}d left!</Badge>;
-    if (expiryStatus === 'warning') return <Badge variant="secondary" className="bg-amber-500/20 text-amber-700"><Clock className="h-3 w-3 mr-1" />{daysUntilExpiry}d left</Badge>;
-    if (daysUntilExpiry) return <Badge variant="outline"><Clock className="h-3 w-3 mr-1" />{daysUntilExpiry}d</Badge>;
+    if (expiryStatus === 'expired') return <Badge variant="destructive">{t('card.expired')}</Badge>;
+    if (expiryStatus === 'urgent') return <Badge variant="destructive" className="animate-pulse"><Clock className="h-3 w-3 mr-1" />{daysUntilExpiry}{t('dashboard.daysLeftShort')}</Badge>;
+    if (expiryStatus === 'warning') return <Badge variant="secondary" className="bg-amber-500/20 text-amber-700"><Clock className="h-3 w-3 mr-1" />{daysUntilExpiry}{t('dashboard.daysLeftShort')}</Badge>;
+    if (daysUntilExpiry) return <Badge variant="outline"><Clock className="h-3 w-3 mr-1" />{daysUntilExpiry}{t('dashboard.daysLeftShort')}</Badge>;
     return null;
   };
 
@@ -55,7 +57,7 @@ export function EligibilityCard({ result }: EligibilityCardProps) {
               confidenceScore >= 50 ? 'bg-amber-500/20 text-amber-600' : 
               'bg-muted text-muted-foreground'
             }`}>
-              {confidenceScore}% Match
+              {confidenceScore}{t('elig.match')}
             </div>
             {getExpiryBadge()}
           </div>
@@ -73,7 +75,7 @@ export function EligibilityCard({ result }: EligibilityCardProps) {
             onClick={() => setExpanded(!expanded)}
             className="text-xs"
           >
-            {expanded ? 'Hide Details' : 'Show Why'}
+            {expanded ? t('elig.hideDetails') : t('elig.showWhy')}
             {expanded ? <ChevronUp className="ml-1 h-3 w-3" /> : <ChevronDown className="ml-1 h-3 w-3" />}
           </Button>
         </div>
@@ -82,7 +84,7 @@ export function EligibilityCard({ result }: EligibilityCardProps) {
           <div className="space-y-3 pt-2 border-t border-border">
             {reasons.length > 0 && (
               <div>
-                <p className="text-xs font-medium text-emerald-600 mb-2">✓ Why you qualify:</p>
+                <p className="text-xs font-medium text-emerald-600 mb-2">{t('elig.qualify')}</p>
                 <ul className="space-y-1">
                   {reasons.map((reason, i) => (
                     <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
@@ -96,7 +98,7 @@ export function EligibilityCard({ result }: EligibilityCardProps) {
 
             {missingCriteria.length > 0 && (
               <div>
-                <p className="text-xs font-medium text-amber-600 mb-2">⚠ What's missing:</p>
+                <p className="text-xs font-medium text-amber-600 mb-2">{t('elig.missing')}</p>
                 <ul className="space-y-1">
                   {missingCriteria.map((criteria, i) => (
                     <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
@@ -110,7 +112,7 @@ export function EligibilityCard({ result }: EligibilityCardProps) {
 
             {scheme.benefits && (
               <div className="bg-muted/50 p-3">
-                <p className="text-xs font-medium mb-1">Benefits:</p>
+                <p className="text-xs font-medium mb-1">{t('card.benefits')}</p>
                 <p className="text-xs text-muted-foreground">{scheme.benefits}</p>
               </div>
             )}
@@ -119,12 +121,12 @@ export function EligibilityCard({ result }: EligibilityCardProps) {
 
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild className="flex-1">
-            <Link to={`/schemes/${scheme.id}`}>Full Details</Link>
+            <Link to={`/schemes/${scheme.id}`}>{t('elig.fullDetails')}</Link>
           </Button>
           {scheme.application_url && isEligible && expiryStatus !== 'expired' && (
             <Button size="sm" asChild>
               <a href={scheme.application_url} target="_blank" rel="noopener noreferrer">
-                Apply <ExternalLink className="ml-1 h-3 w-3" />
+                {t('common.apply')} <ExternalLink className="ml-1 h-3 w-3" />
               </a>
             </Button>
           )}
