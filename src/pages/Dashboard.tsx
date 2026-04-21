@@ -13,8 +13,10 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, AlertTriangle, CheckCircle2, Clock, FileText, ArrowRight, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Dashboard() {
+  const { t } = useLanguage();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   
@@ -95,9 +97,9 @@ export default function Dashboard() {
       
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">Welcome, {profile?.full_name || 'Citizen'}!</h1>
+          <h1 className="text-3xl font-bold">{t('dashboard.welcome')}, {profile?.full_name || t('dashboard.citizen')}!</h1>
           <p className="text-muted-foreground mt-1">
-            Your personalized government scheme recommendations
+            {t('dashboard.subtitle')}
           </p>
         </div>
 
@@ -108,15 +110,15 @@ export default function Dashboard() {
               <div className="flex items-center gap-3">
                 <User className="h-6 w-6 text-amber-600" />
                 <div>
-                  <p className="font-medium">Complete Your Profile</p>
+                  <p className="font-medium">{t('dashboard.completeProfile')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Fill in your details to get accurate scheme recommendations
+                    {t('dashboard.completeProfileDesc')}
                   </p>
                 </div>
               </div>
               <Button asChild>
                 <Link to="/profile">
-                  Update Profile <ArrowRight className="ml-2 h-4 w-4" />
+                  {t('dashboard.updateProfile')} <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </CardContent>
@@ -133,7 +135,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{eligibleSchemes.length}</p>
-                  <p className="text-sm text-muted-foreground">Eligible Schemes</p>
+                  <p className="text-sm text-muted-foreground">{t('dashboard.eligibleSchemes')}</p>
                 </div>
               </div>
             </CardContent>
@@ -147,7 +149,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{partiallyEligible.length}</p>
-                  <p className="text-sm text-muted-foreground">Partial Match</p>
+                  <p className="text-sm text-muted-foreground">{t('dashboard.partialMatch')}</p>
                 </div>
               </div>
             </CardContent>
@@ -161,7 +163,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{urgentSchemes.length}</p>
-                  <p className="text-sm text-muted-foreground">Expiring Soon</p>
+                  <p className="text-sm text-muted-foreground">{t('dashboard.expiringSoon')}</p>
                 </div>
               </div>
             </CardContent>
@@ -175,7 +177,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{schemes.length}</p>
-                  <p className="text-sm text-muted-foreground">Total Schemes</p>
+                  <p className="text-sm text-muted-foreground">{t('dashboard.totalSchemes')}</p>
                 </div>
               </div>
             </CardContent>
@@ -188,17 +190,17 @@ export default function Dashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center gap-2 text-destructive">
                 <Clock className="h-5 w-5" />
-                Deadline Alert!
+                {t('dashboard.deadlineAlert')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
-                These eligible schemes are expiring within 7 days. Apply now!
+                {t('dashboard.deadlineDesc')}
               </p>
               <div className="flex flex-wrap gap-2">
                 {urgentSchemes.map((result) => (
                   <Badge key={result.scheme.id} variant="destructive" className="text-sm py-1 px-3">
-                    {result.scheme.name} - {getDaysUntilExpiry(result.scheme.application_deadline)}d left
+                    {result.scheme.name} - {getDaysUntilExpiry(result.scheme.application_deadline)}{t('dashboard.daysLeftShort')}
                   </Badge>
                 ))}
               </div>
@@ -210,13 +212,13 @@ export default function Dashboard() {
         <Tabs defaultValue="eligible" className="space-y-6">
           <TabsList>
             <TabsTrigger value="eligible">
-              Eligible ({eligibleSchemes.length})
+              {t('dashboard.tabEligible')} ({eligibleSchemes.length})
             </TabsTrigger>
             <TabsTrigger value="partial">
-              Partial Match ({partiallyEligible.length})
+              {t('dashboard.tabPartial')} ({partiallyEligible.length})
             </TabsTrigger>
             <TabsTrigger value="all">
-              All Schemes ({eligibilityResults.length})
+              {t('dashboard.tabAll')} ({eligibilityResults.length})
             </TabsTrigger>
           </TabsList>
 
@@ -226,8 +228,8 @@ export default function Dashboard() {
                 <CardContent className="p-8 text-center">
                   <p className="text-muted-foreground">
                     {isProfileIncomplete 
-                      ? 'Complete your profile to see eligible schemes'
-                      : 'No fully eligible schemes found. Check partial matches or update your profile.'}
+                      ? t('dashboard.noEligibleProfile')
+                      : t('dashboard.noEligible')}
                   </p>
                 </CardContent>
               </Card>
@@ -244,7 +246,7 @@ export default function Dashboard() {
             {partiallyEligible.length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center">
-                  <p className="text-muted-foreground">No partial matches found.</p>
+                  <p className="text-muted-foreground">{t('dashboard.noPartial')}</p>
                 </CardContent>
               </Card>
             ) : (

@@ -13,12 +13,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Save, User } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+  const { t } = useLanguage();
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState<Partial<Profile>>({
@@ -91,8 +93,8 @@ export default function ProfilePage() {
       if (error) throw error;
 
       toast({
-        title: 'Profile Updated',
-        description: 'Your eligibility profile has been saved. Check your dashboard for matching schemes!',
+        title: t('profile.updated'),
+        description: t('profile.updatedDesc'),
       });
 
       navigate('/dashboard');
@@ -100,8 +102,8 @@ export default function ProfilePage() {
       console.error('Error saving profile:', error);
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to save profile. Please try again.',
+        title: t('common.error'),
+        description: t('profile.saveError'),
       });
     } finally {
       setSaving(false);
@@ -119,39 +121,37 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      
+
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold flex items-center gap-3">
               <User className="h-8 w-8 text-primary" />
-              Eligibility Profile
+              {t('profile.title')}
             </h1>
-            <p className="text-muted-foreground mt-2">
-              Complete your profile to discover government schemes you're eligible for.
-            </p>
+            <p className="text-muted-foreground mt-2">{t('profile.subtitle')}</p>
           </div>
 
           <div className="space-y-6">
             {/* Personal Information */}
             <Card>
               <CardHeader>
-                <CardTitle>Personal Information</CardTitle>
-                <CardDescription>Basic details for scheme eligibility</CardDescription>
+                <CardTitle>{t('profile.personal')}</CardTitle>
+                <CardDescription>{t('profile.personalDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
+                  <Label htmlFor="fullName">{t('profile.fullName')}</Label>
                   <Input
                     id="fullName"
                     value={profile.full_name || ''}
                     onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                    placeholder="Enter your full name"
+                    placeholder={t('profile.fullNamePh')}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="age">Age</Label>
+                  <Label htmlFor="age">{t('profile.age')}</Label>
                   <Input
                     id="age"
                     type="number"
@@ -159,38 +159,38 @@ export default function ProfilePage() {
                     max={150}
                     value={profile.age || ''}
                     onChange={(e) => setProfile({ ...profile, age: parseInt(e.target.value) || undefined })}
-                    placeholder="Your age"
+                    placeholder={t('profile.agePh')}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="gender">Gender</Label>
+                  <Label htmlFor="gender">{t('profile.gender')}</Label>
                   <Select
                     value={profile.gender || ''}
                     onValueChange={(value) => setProfile({ ...profile, gender: value as GenderType })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select gender" />
+                      <SelectValue placeholder={t('profile.selectGender')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="male">{t('profile.male')}</SelectItem>
+                      <SelectItem value="female">{t('profile.female')}</SelectItem>
+                      <SelectItem value="other">{t('profile.other')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="category">Category</Label>
+                  <Label htmlFor="category">{t('profile.category')}</Label>
                   <Select
                     value={profile.category || 'general'}
                     onValueChange={(value) => setProfile({ ...profile, category: value as CategoryType })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
+                      <SelectValue placeholder={t('profile.selectCategory')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="general">General</SelectItem>
+                      <SelectItem value="general">{t('profile.general')}</SelectItem>
                       <SelectItem value="obc">OBC</SelectItem>
                       <SelectItem value="sc">SC</SelectItem>
                       <SelectItem value="st">ST</SelectItem>
@@ -204,80 +204,80 @@ export default function ProfilePage() {
             {/* Occupation & Education */}
             <Card>
               <CardHeader>
-                <CardTitle>Occupation & Education</CardTitle>
-                <CardDescription>Your professional and educational background</CardDescription>
+                <CardTitle>{t('profile.occupationEdu')}</CardTitle>
+                <CardDescription>{t('profile.occupationDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="occupation">Occupation</Label>
+                  <Label htmlFor="occupation">{t('profile.occupation')}</Label>
                   <Select
                     value={profile.occupation || ''}
                     onValueChange={(value) => setProfile({ ...profile, occupation: value as OccupationType })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select occupation" />
+                      <SelectValue placeholder={t('profile.selectOccupation')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="student">Student</SelectItem>
-                      <SelectItem value="employed">Employed</SelectItem>
-                      <SelectItem value="self_employed">Self Employed</SelectItem>
-                      <SelectItem value="unemployed">Unemployed</SelectItem>
-                      <SelectItem value="farmer">Farmer</SelectItem>
-                      <SelectItem value="retired">Retired</SelectItem>
-                      <SelectItem value="homemaker">Homemaker</SelectItem>
+                      <SelectItem value="student">{t('profile.student')}</SelectItem>
+                      <SelectItem value="employed">{t('profile.employed')}</SelectItem>
+                      <SelectItem value="self_employed">{t('profile.selfEmployed')}</SelectItem>
+                      <SelectItem value="unemployed">{t('profile.unemployed')}</SelectItem>
+                      <SelectItem value="farmer">{t('profile.farmer')}</SelectItem>
+                      <SelectItem value="retired">{t('profile.retired')}</SelectItem>
+                      <SelectItem value="homemaker">{t('profile.homemaker')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="education">Education Level</Label>
+                  <Label htmlFor="education">{t('profile.education')}</Label>
                   <Select
                     value={profile.education || ''}
                     onValueChange={(value) => setProfile({ ...profile, education: value as EducationType })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select education" />
+                      <SelectValue placeholder={t('profile.selectEducation')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="none">No Formal Education</SelectItem>
-                      <SelectItem value="primary">Primary (1-5)</SelectItem>
-                      <SelectItem value="secondary">Secondary (6-10)</SelectItem>
-                      <SelectItem value="higher_secondary">Higher Secondary (11-12)</SelectItem>
-                      <SelectItem value="graduate">Graduate</SelectItem>
-                      <SelectItem value="postgraduate">Post Graduate</SelectItem>
-                      <SelectItem value="doctorate">Doctorate</SelectItem>
+                      <SelectItem value="none">{t('profile.eduNone')}</SelectItem>
+                      <SelectItem value="primary">{t('profile.eduPrimary')}</SelectItem>
+                      <SelectItem value="secondary">{t('profile.eduSecondary')}</SelectItem>
+                      <SelectItem value="higher_secondary">{t('profile.eduHigherSec')}</SelectItem>
+                      <SelectItem value="graduate">{t('profile.eduGraduate')}</SelectItem>
+                      <SelectItem value="postgraduate">{t('profile.eduPostgrad')}</SelectItem>
+                      <SelectItem value="doctorate">{t('profile.eduDoctorate')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="income">Annual Income (₹)</Label>
+                  <Label htmlFor="income">{t('profile.income')}</Label>
                   <Input
                     id="income"
                     type="number"
                     min={0}
                     value={profile.annual_income || ''}
                     onChange={(e) => setProfile({ ...profile, annual_income: parseInt(e.target.value) || 0 })}
-                    placeholder="Your annual income"
+                    placeholder={t('profile.incomePh')}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="disability">Disability Status</Label>
+                  <Label htmlFor="disability">{t('profile.disability')}</Label>
                   <Select
                     value={profile.disability || 'none'}
                     onValueChange={(value) => setProfile({ ...profile, disability: value as DisabilityType })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select disability status" />
+                      <SelectValue placeholder={t('profile.selectDisability')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      <SelectItem value="visual">Visual Impairment</SelectItem>
-                      <SelectItem value="hearing">Hearing Impairment</SelectItem>
-                      <SelectItem value="locomotor">Locomotor Disability</SelectItem>
-                      <SelectItem value="mental">Mental Disability</SelectItem>
-                      <SelectItem value="multiple">Multiple Disabilities</SelectItem>
+                      <SelectItem value="none">{t('profile.disNone')}</SelectItem>
+                      <SelectItem value="visual">{t('profile.disVisual')}</SelectItem>
+                      <SelectItem value="hearing">{t('profile.disHearing')}</SelectItem>
+                      <SelectItem value="locomotor">{t('profile.disLocomotor')}</SelectItem>
+                      <SelectItem value="mental">{t('profile.disMental')}</SelectItem>
+                      <SelectItem value="multiple">{t('profile.disMultiple')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -287,18 +287,18 @@ export default function ProfilePage() {
             {/* Location */}
             <Card>
               <CardHeader>
-                <CardTitle>Location</CardTitle>
-                <CardDescription>Your state and district for regional schemes</CardDescription>
+                <CardTitle>{t('profile.location')}</CardTitle>
+                <CardDescription>{t('profile.locationDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="state">State</Label>
+                  <Label htmlFor="state">{t('profile.state')}</Label>
                   <Select
                     value={profile.state || ''}
                     onValueChange={(value) => setProfile({ ...profile, state: value })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select state" />
+                      <SelectValue placeholder={t('profile.selectState')} />
                     </SelectTrigger>
                     <SelectContent>
                       {INDIAN_STATES.map((state) => (
@@ -309,12 +309,12 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="district">District</Label>
+                  <Label htmlFor="district">{t('profile.district')}</Label>
                   <Input
                     id="district"
                     value={profile.district || ''}
                     onChange={(e) => setProfile({ ...profile, district: e.target.value })}
-                    placeholder="Enter your district"
+                    placeholder={t('profile.districtPh')}
                   />
                 </div>
               </CardContent>
@@ -323,14 +323,14 @@ export default function ProfilePage() {
             {/* Special Categories */}
             <Card>
               <CardHeader>
-                <CardTitle>Special Categories</CardTitle>
-                <CardDescription>Additional eligibility criteria</CardDescription>
+                <CardTitle>{t('profile.special')}</CardTitle>
+                <CardDescription>{t('profile.specialDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="bpl">Below Poverty Line (BPL)</Label>
-                    <p className="text-sm text-muted-foreground">Do you have a BPL card?</p>
+                    <Label htmlFor="bpl">{t('profile.bpl')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('profile.bplDesc')}</p>
                   </div>
                   <Switch
                     id="bpl"
@@ -341,8 +341,8 @@ export default function ProfilePage() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="minority">Minority Community</Label>
-                    <p className="text-sm text-muted-foreground">Do you belong to a minority community?</p>
+                    <Label htmlFor="minority">{t('profile.minority')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('profile.minorityDesc')}</p>
                   </div>
                   <Switch
                     id="minority"
@@ -357,12 +357,12 @@ export default function ProfilePage() {
               {saving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
+                  {t('profile.saving')}
                 </>
               ) : (
                 <>
                   <Save className="mr-2 h-4 w-4" />
-                  Save Profile & Find Schemes
+                  {t('profile.save')}
                 </>
               )}
             </Button>

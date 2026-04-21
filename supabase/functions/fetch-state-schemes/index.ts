@@ -113,23 +113,44 @@ STRICT RULES:
       throw new Error("AI returned invalid scheme data");
     }
 
+    // Allowed enum values — drop anything else to avoid Postgres enum errors
+    const ALLOWED_GENDER = new Set(["male", "female", "other"]);
+    const ALLOWED_CATEGORY = new Set(["general", "obc", "sc", "st", "ews"]);
+    const ALLOWED_OCCUPATION = new Set([
+      "student", "employed", "self_employed", "unemployed", "farmer", "retired", "homemaker",
+    ]);
+    const ALLOWED_EDUCATION = new Set([
+      "none", "primary", "secondary", "higher_secondary", "graduate", "postgraduate", "doctorate",
+    ]);
+    const ALLOWED_DISABILITY = new Set([
+      "none", "visual", "hearing", "locomotor", "mental", "multiple",
+    ]);
+
+    const cleanArr = (arr: any, allowed: Set<string>): string[] | null => {
+      if (!Array.isArray(arr)) return null;
+      const filtered = arr
+        .map((v) => (typeof v === "string" ? v.toLowerCase().trim() : ""))
+        .filter((v) => allowed.has(v));
+      return filtered.length > 0 ? filtered : null;
+    };
+
     const schemesToInsert = schemes.map((s: any) => ({
       name: s.name,
       description: s.description,
       ministry: s.ministry,
       benefits: s.benefits,
-      documents_required: s.documents_required,
+      documents_required: Array.isArray(s.documents_required) ? s.documents_required : null,
       application_url: s.application_url,
       application_deadline: s.application_deadline,
       min_age: s.min_age,
       max_age: s.max_age,
-      gender: s.gender,
-      categories: s.categories,
-      occupations: s.occupations,
-      education_levels: s.education_levels,
-      disabilities: s.disabilities,
+      gender: cleanArr(s.gender, ALLOWED_GENDER),
+      categories: cleanArr(s.categories, ALLOWED_CATEGORY),
+      occupations: cleanArr(s.occupations, ALLOWED_OCCUPATION),
+      education_levels: cleanArr(s.education_levels, ALLOWED_EDUCATION),
+      disabilities: cleanArr(s.disabilities, ALLOWED_DISABILITY),
       max_income: s.max_income,
-      states: s.states && s.states.length > 0 ? s.states : null,
+      states: Array.isArray(s.states) && s.states.length > 0 ? s.states : null,
       bpl_only: s.bpl_only || false,
       minority_only: s.minority_only || false,
       is_active: true,

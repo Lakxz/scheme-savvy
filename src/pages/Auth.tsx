@@ -9,20 +9,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Shield, Mail, Lock, User } from 'lucide-react';
 import { z } from 'zod';
-
-const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-});
-
-const signupSchema = loginSchema.extend({
-  fullName: z.string().min(2, 'Name must be at least 2 characters'),
-});
+import { useLanguage } from '@/contexts/LanguageContext';
+import { LanguageToggle } from '@/components/LanguageToggle';
 
 export default function Auth() {
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get('mode') === 'signup' ? 'signup' : 'login';
-  
+  const { t } = useLanguage();
+
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,6 +27,15 @@ export default function Auth() {
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const loginSchema = z.object({
+    email: z.string().email(t('auth.errEmail')),
+    password: z.string().min(6, t('auth.errPassword')),
+  });
+
+  const signupSchema = loginSchema.extend({
+    fullName: z.string().min(2, t('auth.errName')),
+  });
 
   useEffect(() => {
     if (user) {
@@ -66,15 +69,15 @@ export default function Auth() {
     if (error) {
       toast({
         variant: 'destructive',
-        title: 'Login Failed',
-        description: error.message === 'Invalid login credentials' 
-          ? 'Invalid email or password. Please try again.'
+        title: t('auth.loginFailed'),
+        description: error.message === 'Invalid login credentials'
+          ? t('auth.invalidCreds')
           : error.message,
       });
     } else {
       toast({
-        title: 'Welcome back!',
-        description: 'You have successfully logged in.',
+        title: t('auth.welcomeToast'),
+        description: t('auth.loggedIn'),
       });
       navigate('/dashboard');
     }
@@ -107,21 +110,21 @@ export default function Auth() {
       if (error.message.includes('already registered')) {
         toast({
           variant: 'destructive',
-          title: 'Account Exists',
-          description: 'This email is already registered. Please sign in instead.',
+          title: t('auth.accountExists'),
+          description: t('auth.alreadyRegistered'),
         });
         setActiveTab('login');
       } else {
         toast({
           variant: 'destructive',
-          title: 'Signup Failed',
+          title: t('auth.signupFailed'),
           description: error.message,
         });
       }
     } else {
       toast({
-        title: 'Account Created!',
-        description: 'Welcome to GovScheme Alert. Complete your profile to see eligible schemes.',
+        title: t('auth.accountCreated'),
+        description: t('auth.welcomeNew'),
       });
       navigate('/profile');
     }
@@ -130,36 +133,37 @@ export default function Auth() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        <div className="flex justify-end mb-4">
+          <LanguageToggle />
+        </div>
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <Shield className="h-12 w-12 text-primary" />
           </div>
-          <h1 className="text-2xl font-bold">GovScheme Alert</h1>
-          <p className="text-muted-foreground">Find government schemes you're eligible for</p>
+          <h1 className="text-2xl font-bold">{t('auth.title')}</h1>
+          <p className="text-muted-foreground">{t('auth.tagline')}</p>
         </div>
 
         <Card>
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-xl text-center">
-              {activeTab === 'login' ? 'Welcome Back' : 'Create Account'}
+              {activeTab === 'login' ? t('auth.welcomeBack') : t('auth.createAccount')}
             </CardTitle>
             <CardDescription className="text-center">
-              {activeTab === 'login' 
-                ? 'Sign in to access your dashboard' 
-                : 'Start discovering eligible schemes today'}
+              {activeTab === 'login' ? t('auth.signInDesc') : t('auth.signUpDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="login">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                <TabsTrigger value="login">{t('auth.tabSignIn')}</TabsTrigger>
+                <TabsTrigger value="signup">{t('auth.tabSignUp')}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
+                    <Label htmlFor="login-email">{t('auth.email')}</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -175,7 +179,7 @@ export default function Auth() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="login-password">Password</Label>
+                    <Label htmlFor="login-password">{t('auth.password')}</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -191,7 +195,7 @@ export default function Auth() {
                   </div>
 
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Signing in...' : 'Sign In'}
+                    {loading ? t('auth.signingIn') : t('auth.tabSignIn')}
                   </Button>
                 </form>
               </TabsContent>
@@ -199,7 +203,7 @@ export default function Auth() {
               <TabsContent value="signup">
                 <form onSubmit={handleSignup} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="signup-name">Full Name</Label>
+                    <Label htmlFor="signup-name">{t('auth.fullName')}</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -215,7 +219,7 @@ export default function Auth() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
+                    <Label htmlFor="signup-email">{t('auth.email')}</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -231,7 +235,7 @@ export default function Auth() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
+                    <Label htmlFor="signup-password">{t('auth.password')}</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -247,7 +251,7 @@ export default function Auth() {
                   </div>
 
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Creating account...' : 'Create Account'}
+                    {loading ? t('auth.creatingAccount') : t('auth.createAccount')}
                   </Button>
                 </form>
               </TabsContent>
