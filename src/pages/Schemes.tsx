@@ -102,6 +102,17 @@ export default function SchemesPage() {
 
   const ministries = [...new Set(schemes.map((s) => s.ministry))];
 
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredSchemes.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedSchemes = filteredSchemes.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
