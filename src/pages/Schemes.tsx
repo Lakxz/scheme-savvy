@@ -26,6 +26,8 @@ export default function SchemesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [ministryFilter, setMinistryFilter] = useState<string>('all');
   const [fetching, setFetching] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
   const { toast } = useToast();
 
   useEffect(() => {
