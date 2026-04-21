@@ -10,8 +10,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, ArrowLeft, ExternalLink, Calendar, Building2, FileText, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function SchemeDetails() {
+  const { t, language } = useLanguage();
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   
@@ -62,9 +64,9 @@ export default function SchemeDetails() {
       <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
         <main className="flex-1 container mx-auto px-4 py-8 text-center">
-          <h1 className="text-2xl font-bold">Scheme not found</h1>
+          <h1 className="text-2xl font-bold">{t('details.notFound')}</h1>
           <Button asChild className="mt-4">
-            <Link to="/schemes">Browse Schemes</Link>
+            <Link to="/schemes">{t('nav.browseSchemes')}</Link>
           </Button>
         </main>
         <Footer />
@@ -84,7 +86,7 @@ export default function SchemeDetails() {
         <Button variant="ghost" asChild className="mb-6">
           <Link to="/schemes">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Schemes
+            {t('details.back')}
           </Link>
         </Button>
 
@@ -95,16 +97,16 @@ export default function SchemeDetails() {
               <div className="flex items-start justify-between gap-4 mb-4">
                 <h1 className="text-3xl font-bold">{scheme.name}</h1>
                 {expiryStatus === 'expired' ? (
-                  <Badge variant="destructive">Expired</Badge>
+                  <Badge variant="destructive">{t('card.expired')}</Badge>
                 ) : expiryStatus === 'urgent' ? (
                   <Badge variant="destructive" className="animate-pulse">
                     <Clock className="h-3 w-3 mr-1" />
-                    {daysUntilExpiry} days left!
+                    {daysUntilExpiry} {t('card.daysLeftUrgent')}
                   </Badge>
                 ) : expiryStatus === 'warning' ? (
                   <Badge variant="secondary" className="bg-amber-500/20 text-amber-700">
                     <Clock className="h-3 w-3 mr-1" />
-                    {daysUntilExpiry} days left
+                    {daysUntilExpiry} {t('card.daysLeft')}
                   </Badge>
                 ) : null}
               </div>
@@ -120,7 +122,7 @@ export default function SchemeDetails() {
             {scheme.benefits && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Benefits</CardTitle>
+                  <CardTitle className="text-lg">{t('details.benefits')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p>{scheme.benefits}</p>
@@ -133,7 +135,7 @@ export default function SchemeDetails() {
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <FileText className="h-5 w-5" />
-                    Required Documents
+                    {t('details.requiredDocs')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -151,48 +153,48 @@ export default function SchemeDetails() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Eligibility Criteria</CardTitle>
+                <CardTitle className="text-lg">{t('details.criteria')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {scheme.min_age !== null || scheme.max_age !== null ? (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Age Range</span>
-                    <span>{scheme.min_age || 0} - {scheme.max_age || '∞'} years</span>
+                    <span className="text-muted-foreground">{t('details.ageRange')}</span>
+                    <span>{scheme.min_age || 0} - {scheme.max_age || '∞'} {t('details.years')}</span>
                   </div>
                 ) : null}
                 
                 {scheme.gender && scheme.gender.length > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Gender</span>
+                    <span className="text-muted-foreground">{t('profile.gender')}</span>
                     <span className="capitalize">{scheme.gender.join(', ')}</span>
                   </div>
                 )}
 
                 {scheme.categories && scheme.categories.length > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Categories</span>
+                    <span className="text-muted-foreground">{t('profile.category')}</span>
                     <span className="uppercase">{scheme.categories.join(', ')}</span>
                   </div>
                 )}
 
                 {scheme.max_income !== null && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Max Annual Income</span>
+                    <span className="text-muted-foreground">{t('details.maxIncome')}</span>
                     <span>₹{scheme.max_income.toLocaleString()}</span>
                   </div>
                 )}
 
                 {scheme.bpl_only && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">BPL Families Only</span>
-                    <Badge variant="secondary">Yes</Badge>
+                    <span className="text-muted-foreground">{t('details.bplOnly')}</span>
+                    <Badge variant="secondary">{t('common.yes')}</Badge>
                   </div>
                 )}
 
                 {scheme.minority_only && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Minorities Only</span>
-                    <Badge variant="secondary">Yes</Badge>
+                    <span className="text-muted-foreground">{t('details.minoritiesOnly')}</span>
+                    <Badge variant="secondary">{t('common.yes')}</Badge>
                   </div>
                 )}
               </CardContent>
@@ -211,7 +213,7 @@ export default function SchemeDetails() {
                     ) : (
                       <XCircle className="h-5 w-5 text-amber-500" />
                     )}
-                    Your Eligibility
+                    {t('details.yourEligibility')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -219,12 +221,12 @@ export default function SchemeDetails() {
                     <span className={`text-3xl font-bold ${eligibility.isEligible ? 'text-primary' : 'text-amber-600'}`}>
                       {eligibility.confidenceScore}%
                     </span>
-                    <p className="text-sm text-muted-foreground">Match Score</p>
+                    <p className="text-sm text-muted-foreground">{t('details.matchScore')}</p>
                   </div>
 
                   {eligibility.reasons.length > 0 && (
                     <div>
-                      <p className="text-xs font-medium text-primary mb-2">✓ You qualify because:</p>
+                      <p className="text-xs font-medium text-primary mb-2">{t('details.qualifyBecause')}</p>
                       <ul className="space-y-1">
                         {eligibility.reasons.slice(0, 3).map((reason, i) => (
                           <li key={i} className="text-xs text-muted-foreground flex gap-2">
@@ -238,7 +240,7 @@ export default function SchemeDetails() {
 
                   {eligibility.missingCriteria.length > 0 && (
                     <div>
-                      <p className="text-xs font-medium text-amber-600 mb-2">⚠ Missing criteria:</p>
+                      <p className="text-xs font-medium text-amber-600 mb-2">{t('details.missing')}</p>
                       <ul className="space-y-1">
                         {eligibility.missingCriteria.slice(0, 3).map((criteria, i) => (
                           <li key={i} className="text-xs text-muted-foreground flex gap-2">
@@ -256,13 +258,13 @@ export default function SchemeDetails() {
             {/* Apply Card */}
             <Card>
               <CardHeader>
-                <CardTitle>Apply Now</CardTitle>
+                <CardTitle>{t('details.applyNow')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {scheme.application_deadline && (
                   <div className="flex items-center gap-2 text-sm">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span>Deadline: {new Date(scheme.application_deadline).toLocaleDateString('en-IN', {
+                    <span>{t('details.deadline')}: {new Date(scheme.application_deadline).toLocaleDateString(language === 'ta' ? 'ta-IN' : 'en-IN', {
                       day: 'numeric',
                       month: 'long',
                       year: 'numeric'
@@ -273,23 +275,23 @@ export default function SchemeDetails() {
                 {scheme.application_url && expiryStatus !== 'expired' ? (
                   <Button asChild className="w-full">
                     <a href={scheme.application_url} target="_blank" rel="noopener noreferrer">
-                      Apply on Official Portal
+                      {t('details.applyOfficial')}
                       <ExternalLink className="ml-2 h-4 w-4" />
                     </a>
                   </Button>
                 ) : expiryStatus === 'expired' ? (
                   <Button disabled className="w-full">
-                    Application Closed
+                    {t('details.appClosed')}
                   </Button>
                 ) : (
                   <Button disabled className="w-full">
-                    No Application Link Available
+                    {t('details.noLink')}
                   </Button>
                 )}
 
                 {!user && (
                   <p className="text-xs text-center text-muted-foreground">
-                    <Link to="/auth" className="text-primary hover:underline">Sign in</Link> to check your eligibility
+                    <Link to="/auth" className="text-primary hover:underline">{t('nav.signIn')}</Link> {t('details.signInToCheck')}
                   </p>
                 )}
               </CardContent>
