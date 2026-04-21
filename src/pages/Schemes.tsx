@@ -74,6 +74,7 @@ export default function SchemesPage() {
     }
 
     setFilteredSchemes(filtered);
+    setCurrentPage(1);
   };
 
   const fetchWithAI = async () => {
