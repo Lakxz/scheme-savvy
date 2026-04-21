@@ -176,13 +176,69 @@ export default function SchemesPage() {
         ) : (
           <>
             <p className="text-sm text-muted-foreground mb-4">
-              Showing {filteredSchemes.length} of {schemes.length} schemes
+              Showing {startIndex + 1}-{Math.min(endIndex, filteredSchemes.length)} of {filteredSchemes.length} schemes
+              {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredSchemes.map((scheme) => (
+              {paginatedSchemes.map((scheme) => (
                 <SchemeCard key={scheme.id} scheme={scheme} />
               ))}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-8">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                      // Show first page, last page, current page, and pages around current
+                      if (
+                        page === 1 ||
+                        page === totalPages ||
+                        (page >= currentPage - 1 && page <= currentPage + 1)
+                      ) {
+                        return (
+                          <PaginationItem key={page}>
+                            <PaginationLink
+                              onClick={() => handlePageChange(page)}
+                              isActive={currentPage === page}
+                              className="cursor-pointer"
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      }
+
+                      // Show ellipsis for gaps
+                      if (page === currentPage - 2 || page === currentPage + 2) {
+                        return (
+                          <PaginationItem key={page}>
+                            <PaginationEllipsis />
+                          </PaginationItem>
+                        );
+                      }
+
+                      return null;
+                    })}
+
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
           </>
         )}
       </main>
