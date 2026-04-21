@@ -2,3 +2,6 @@ project_id = "phqufizbnmnpxreaghkt"
 
 [functions.fetch-schemes]
 verify_jwt = false
+
+[functions.fetch-state-schemes]
+verify_jwt = false
