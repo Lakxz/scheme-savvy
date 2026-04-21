@@ -20,51 +20,42 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Check how many schemes already exist
-    const { count } = await supabase
-      .from("schemes")
-      .select("*", { count: "exact", head: true })
-      .eq("is_active", true);
-
-    const existingCount = count || 0;
-
-    const prompt = `Generate a JSON array of 20 real Indian government scholarships and welfare schemes that are currently active or recently announced. For each scheme, provide accurate details in this exact JSON format:
+    const prompt = `Generate a JSON array of 25 real STATE GOVERNMENT schemes from various Indian states (Tamil Nadu, Karnataka, Kerala, Maharashtra, Gujarat, Rajasthan, Andhra Pradesh, Telangana, West Bengal, Punjab, Uttar Pradesh, Bihar, Odisha, Madhya Pradesh, etc.). Cover scholarships, farmer welfare, women empowerment, housing, health, pension, and skill schemes. Return strict JSON in this exact format:
 
 [
   {
     "name": "Scheme Name",
-    "description": "2-3 sentence description of the scheme",
-    "ministry": "Ministry/Department name",
-    "benefits": "What beneficiaries receive (amount, services, etc.)",
-    "documents_required": ["Aadhaar Card", "Income Certificate", "etc"],
-    "application_url": "https://official-website.gov.in",
-    "application_deadline": "2026-06-30",
+    "description": "2-3 sentence description",
+    "ministry": "State Department / Ministry name (include state name)",
+    "benefits": "What beneficiaries receive",
+    "documents_required": ["Aadhaar Card", "Income Certificate"],
+    "application_url": "https://official-state-portal.gov.in",
+    "application_deadline": "2026-08-30",
     "min_age": 18,
     "max_age": 35,
     "gender": ["male", "female", "other"],
     "categories": ["general", "obc", "sc", "st", "ews"],
     "occupations": ["student"],
-    "education_levels": ["graduate", "postgraduate"],
+    "education_levels": ["graduate"],
     "disabilities": ["none"],
     "max_income": 250000,
-    "states": null,
+    "states": ["Tamil Nadu"],
     "bpl_only": false,
     "minority_only": false
   }
 ]
 
-Important rules:
+STRICT RULES:
+- Every scheme MUST have a non-empty "states" array with at least one Indian state name (since these are state schemes).
 - Use ONLY these gender values: "male", "female", "other"
 - Use ONLY these category values: "general", "obc", "sc", "st", "ews"
 - Use ONLY these occupation values: "student", "employed", "self_employed", "unemployed", "farmer", "retired", "homemaker"
 - Use ONLY these education values: "none", "primary", "secondary", "higher_secondary", "graduate", "postgraduate", "doctorate"
 - Use ONLY these disability values: "none", "visual", "hearing", "locomotor", "mental", "multiple"
-- Set states to null for pan-India schemes, or use an array of state names for state-specific ones
-- Set application_deadline to realistic future dates in 2026
-- Include a diverse mix: scholarships for students, farmer schemes, women empowerment, disability benefits, skill development, housing, health insurance, pension schemes
-- Use real scheme names like PM Kisan, Ayushman Bharat, NSP scholarships, PMEGP, etc.
-- max_income should be a number (annual income in INR) or null
-- Return ONLY the JSON array, no other text`;
+- application_deadline must be a future date in 2026
+- Use real schemes like Tamil Nadu Pudhumai Penn, Kalaignar Magalir Urimai Thogai, Karnataka Gruha Lakshmi, Kerala Snehapoorvam, Mahatma Jyotirao Phule Jan Arogya Yojana, Mukhyamantri Ladli Behna, etc.
+- Cover at least 10 different states
+- Return ONLY the JSON array, no markdown, no extra text.`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -80,7 +71,7 @@ Important rules:
             {
               role: "system",
               content:
-                "You are a database of Indian government schemes and scholarships. Return only valid JSON arrays with accurate scheme data. No markdown, no code blocks, just raw JSON.",
+                "You are a database of Indian STATE government schemes. Return only valid JSON arrays with accurate state-specific scheme data. No markdown, no code blocks.",
             },
             { role: "user", content: prompt },
           ],
@@ -109,7 +100,6 @@ Important rules:
     const aiData = await response.json();
     const content = aiData.choices?.[0]?.message?.content || "";
 
-    // Parse JSON from the response - handle markdown code blocks
     let schemes;
     try {
       const jsonStr = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
@@ -123,7 +113,6 @@ Important rules:
       throw new Error("AI returned invalid scheme data");
     }
 
-    // Insert schemes into database
     const schemesToInsert = schemes.map((s: any) => ({
       name: s.name,
       description: s.description,
@@ -140,11 +129,11 @@ Important rules:
       education_levels: s.education_levels,
       disabilities: s.disabilities,
       max_income: s.max_income,
-      states: s.states,
+      states: s.states && s.states.length > 0 ? s.states : null,
       bpl_only: s.bpl_only || false,
       minority_only: s.minority_only || false,
       is_active: true,
-      scheme_level: "central",
+      scheme_level: "state",
     }));
 
     const { data: inserted, error: insertError } = await supabase
@@ -154,19 +143,19 @@ Important rules:
 
     if (insertError) {
       console.error("Insert error:", insertError);
-      throw new Error(`Failed to insert schemes: ${insertError.message}`);
+      throw new Error(`Failed to insert state schemes: ${insertError.message}`);
     }
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Successfully fetched and stored ${inserted?.length || 0} schemes`,
+        message: `Successfully fetched ${inserted?.length || 0} state schemes`,
         count: inserted?.length || 0,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (e) {
-    console.error("fetch-schemes error:", e);
+    console.error("fetch-state-schemes error:", e);
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

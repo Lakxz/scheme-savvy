@@ -168,6 +168,7 @@ export type Database = {
           minority_only: boolean | null
           name: string
           occupations: Database["public"]["Enums"]["occupation_type"][] | null
+          scheme_level: Database["public"]["Enums"]["scheme_level"]
           states: string[] | null
           updated_at: string | null
         }
@@ -194,6 +195,7 @@ export type Database = {
           minority_only?: boolean | null
           name: string
           occupations?: Database["public"]["Enums"]["occupation_type"][] | null
+          scheme_level?: Database["public"]["Enums"]["scheme_level"]
           states?: string[] | null
           updated_at?: string | null
         }
@@ -220,6 +222,7 @@ export type Database = {
           minority_only?: boolean | null
           name?: string
           occupations?: Database["public"]["Enums"]["occupation_type"][] | null
+          scheme_level?: Database["public"]["Enums"]["scheme_level"]
           states?: string[] | null
           updated_at?: string | null
         }
@@ -359,6 +362,7 @@ export type Database = {
         | "farmer"
         | "retired"
         | "homemaker"
+      scheme_level: "central" | "state"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -515,6 +519,7 @@ export const Constants = {
         "retired",
         "homemaker",
       ],
+      scheme_level: ["central", "state"],
     },
   },
 } as const
