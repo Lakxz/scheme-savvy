@@ -7,6 +7,15 @@ import { SchemeCard } from '@/components/schemes/SchemeCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import { Loader2, Search, Filter, Sparkles } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
