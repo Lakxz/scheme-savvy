@@ -144,6 +144,7 @@ Important rules:
       bpl_only: s.bpl_only || false,
       minority_only: s.minority_only || false,
       is_active: true,
+      scheme_level: "central",
     }));
 
     const { data: inserted, error: insertError } = await supabase

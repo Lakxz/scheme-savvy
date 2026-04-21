@@ -5,6 +5,7 @@ import { Scheme } from '@/types/database';
 import { getDaysUntilExpiry, getExpiryStatus } from '@/lib/eligibility-engine';
 import { Calendar, Building2, FileText, ExternalLink, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SchemeCardProps {
   scheme: Scheme;
@@ -13,21 +14,22 @@ interface SchemeCardProps {
 }
 
 export function SchemeCard({ scheme, eligibilityScore, showEligibility = false }: SchemeCardProps) {
+  const { t } = useLanguage();
   const daysUntilExpiry = getDaysUntilExpiry(scheme.application_deadline);
   const expiryStatus = getExpiryStatus(daysUntilExpiry);
 
   const getExpiryBadge = () => {
     switch (expiryStatus) {
       case 'expired':
-        return <Badge variant="destructive">Expired</Badge>;
+        return <Badge variant="destructive">{t('card.expired')}</Badge>;
       case 'urgent':
-        return <Badge variant="destructive">{daysUntilExpiry} days left!</Badge>;
+        return <Badge variant="destructive">{daysUntilExpiry} {t('card.daysLeftUrgent')}</Badge>;
       case 'warning':
-        return <Badge variant="secondary" className="bg-amber-500/20 text-amber-700">{daysUntilExpiry} days left</Badge>;
+        return <Badge variant="secondary" className="bg-amber-500/20 text-amber-700">{daysUntilExpiry} {t('card.daysLeft')}</Badge>;
       case 'safe':
-        return <Badge variant="outline">{daysUntilExpiry} days left</Badge>;
+        return <Badge variant="outline">{daysUntilExpiry} {t('card.daysLeft')}</Badge>;
       default:
-        return <Badge variant="outline">No deadline</Badge>;
+        return <Badge variant="outline">{t('card.noDeadline')}</Badge>;
     }
   };
 
@@ -47,7 +49,7 @@ export function SchemeCard({ scheme, eligibilityScore, showEligibility = false }
               <span className={`text-xl font-bold ${eligibilityScore >= 80 ? 'text-emerald-600' : eligibilityScore >= 50 ? 'text-amber-600' : 'text-muted-foreground'}`}>
                 {eligibilityScore}%
               </span>
-              <p className="text-[10px] text-muted-foreground">Match</p>
+              <p className="text-[10px] text-muted-foreground">{t('card.match')}</p>
             </div>
           )}
         </div>
@@ -58,7 +60,7 @@ export function SchemeCard({ scheme, eligibilityScore, showEligibility = false }
 
         {scheme.benefits && (
           <div className="bg-muted/50 p-3 text-sm">
-            <p className="font-medium text-xs text-muted-foreground mb-1">Benefits:</p>
+            <p className="font-medium text-xs text-muted-foreground mb-1">{t('card.benefits')}</p>
             <p className="line-clamp-2">{scheme.benefits}</p>
           </div>
         )}
@@ -68,14 +70,14 @@ export function SchemeCard({ scheme, eligibilityScore, showEligibility = false }
           {scheme.documents_required && (
             <Badge variant="outline" className="text-xs">
               <FileText className="h-3 w-3 mr-1" />
-              {scheme.documents_required.length} docs
+              {scheme.documents_required.length} {t('card.docs')}
             </Badge>
           )}
         </div>
 
         <div className="flex gap-2 pt-2">
           <Button variant="outline" asChild className="flex-1">
-            <Link to={`/schemes/${scheme.id}`}>View Details</Link>
+            <Link to={`/schemes/${scheme.id}`}>{t('common.viewDetails')}</Link>
           </Button>
           {scheme.application_url && expiryStatus !== 'expired' && (
             <Button asChild size="icon" variant="default">

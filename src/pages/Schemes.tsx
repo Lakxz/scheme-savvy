@@ -18,8 +18,10 @@ import {
 } from '@/components/ui/pagination';
 import { Loader2, Search, Filter, Sparkles } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function SchemesPage() {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [schemes, setSchemes] = useState<Scheme[]>([]);
   const [filteredSchemes, setFilteredSchemes] = useState<Scheme[]>([]);
@@ -44,6 +46,7 @@ export default function SchemesPage() {
         .from('schemes')
         .select('*')
         .eq('is_active', true)
+        .eq('scheme_level', 'central')
         .order('application_deadline', { ascending: true });
 
       if (error) throw error;
@@ -84,15 +87,15 @@ export default function SchemesPage() {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       toast({
-        title: 'Schemes Updated',
-        description: `${data.count} new schemes fetched using AI`,
+        title: t('schemes.updated'),
+        description: `${data.count} ${t('schemes.aiSuccess')}`,
       });
       await fetchSchemes();
     } catch (error: any) {
       console.error('AI fetch error:', error);
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to fetch schemes with AI',
+        title: t('common.error'),
+        description: error.message || t('schemes.aiError'),
         variant: 'destructive',
       });
     } finally {
@@ -120,10 +123,8 @@ export default function SchemesPage() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Browse Government Schemes</h1>
-            <p className="text-muted-foreground mt-1">
-              Explore all available government schemes and find what you're eligible for
-            </p>
+            <h1 className="text-3xl font-bold">{t('schemes.title')}</h1>
+            <p className="text-muted-foreground mt-1">{t('schemes.subtitle')}</p>
           </div>
           <Button onClick={fetchWithAI} disabled={fetching} className="shrink-0">
             {fetching ? (
@@ -131,7 +132,7 @@ export default function SchemesPage() {
             ) : (
               <Sparkles className="h-4 w-4 mr-2" />
             )}
-            {fetching ? 'Fetching...' : 'Fetch with AI'}
+            {fetching ? t('schemes.fetching') : t('schemes.fetchAI')}
           </Button>
         </div>
 
@@ -140,7 +141,7 @@ export default function SchemesPage() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search schemes by name, ministry, or benefits..."
+              placeholder={t('schemes.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -150,10 +151,10 @@ export default function SchemesPage() {
             <Select value={ministryFilter} onValueChange={setMinistryFilter}>
               <SelectTrigger>
                 <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Filter by ministry" />
+                <SelectValue placeholder={t('schemes.filterMinistry')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Ministries</SelectItem>
+                <SelectItem value="all">{t('common.allMinistries')}</SelectItem>
                 {ministries.map((ministry) => (
                   <SelectItem key={ministry} value={ministry}>
                     {ministry}
@@ -171,13 +172,13 @@ export default function SchemesPage() {
           </div>
         ) : filteredSchemes.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No schemes found matching your criteria.</p>
+            <p className="text-muted-foreground">{t('schemes.noResults')}</p>
           </div>
         ) : (
           <>
             <p className="text-sm text-muted-foreground mb-4">
-              Showing {startIndex + 1}-{Math.min(endIndex, filteredSchemes.length)} of {filteredSchemes.length} schemes
-              {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
+              {t('schemes.showing')} {startIndex + 1}-{Math.min(endIndex, filteredSchemes.length)} {t('schemes.of')} {filteredSchemes.length} {t('schemes.schemes')}
+              {totalPages > 1 && ` (${t('schemes.page')} ${currentPage} / ${totalPages})`}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {paginatedSchemes.map((scheme) => (
