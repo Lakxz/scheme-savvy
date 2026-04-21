@@ -1,6 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { LanguageToggle } from '@/components/LanguageToggle';
 import { Bell, LogOut, User, Shield, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import {
@@ -13,6 +15,7 @@ import {
 
 export function Navbar() {
   const { user, signOut } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -33,13 +36,19 @@ export function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
             <Link to="/schemes" className="text-muted-foreground hover:text-foreground transition-colors">
-              Browse Schemes
+              {t('nav.browseSchemes')}
             </Link>
+            <Link to="/state-schemes" className="text-muted-foreground hover:text-foreground transition-colors">
+              {t('nav.stateSchemes')}
+            </Link>
+            {user && (
+              <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
+                {t('nav.dashboard')}
+              </Link>
+            )}
+            <LanguageToggle />
             {user ? (
               <>
-                <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Dashboard
-                </Link>
                 <Button variant="ghost" size="icon" asChild>
                   <Link to="/notifications">
                     <Bell className="h-5 w-5" />
@@ -53,12 +62,12 @@ export function Navbar() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                      <Link to="/profile">Profile Settings</Link>
+                      <Link to="/profile">{t('nav.profile')}</Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut}>
                       <LogOut className="mr-2 h-4 w-4" />
-                      Sign Out
+                      {t('nav.signOut')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -66,24 +75,26 @@ export function Navbar() {
             ) : (
               <div className="flex items-center gap-2">
                 <Button variant="ghost" asChild>
-                  <Link to="/auth">Sign In</Link>
+                  <Link to="/auth">{t('nav.signIn')}</Link>
                 </Button>
                 <Button asChild>
-                  <Link to="/auth?mode=signup">Get Started</Link>
+                  <Link to="/auth?mode=signup">{t('nav.getStarted')}</Link>
                 </Button>
               </div>
             )}
           </div>
 
           {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </Button>
+          <div className="md:hidden flex items-center gap-2">
+            <LanguageToggle />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -94,7 +105,14 @@ export function Navbar() {
               className="block text-muted-foreground hover:text-foreground transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Browse Schemes
+              {t('nav.browseSchemes')}
+            </Link>
+            <Link
+              to="/state-schemes"
+              className="block text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {t('nav.stateSchemes')}
             </Link>
             {user ? (
               <>
@@ -103,27 +121,27 @@ export function Navbar() {
                   className="block text-muted-foreground hover:text-foreground transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Dashboard
+                  {t('nav.dashboard')}
                 </Link>
                 <Link
                   to="/profile"
                   className="block text-muted-foreground hover:text-foreground transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Profile
+                  {t('nav.profileShort')}
                 </Link>
                 <Button variant="outline" onClick={handleSignOut} className="w-full">
                   <LogOut className="mr-2 h-4 w-4" />
-                  Sign Out
+                  {t('nav.signOut')}
                 </Button>
               </>
             ) : (
               <div className="space-y-2">
                 <Button variant="outline" asChild className="w-full">
-                  <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
+                  <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>{t('nav.signIn')}</Link>
                 </Button>
                 <Button asChild className="w-full">
-                  <Link to="/auth?mode=signup" onClick={() => setMobileMenuOpen(false)}>Get Started</Link>
+                  <Link to="/auth?mode=signup" onClick={() => setMobileMenuOpen(false)}>{t('nav.getStarted')}</Link>
                 </Button>
               </div>
             )}
