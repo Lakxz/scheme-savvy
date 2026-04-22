@@ -1,0 +1,5 @@
+ALTER TABLE public.schemes
+  ADD COLUMN IF NOT EXISTS name_ta TEXT,
+  ADD COLUMN IF NOT EXISTS description_ta TEXT,
+  ADD COLUMN IF NOT EXISTS ministry_ta TEXT,
+  ADD COLUMN IF NOT EXISTS benefits_ta TEXT;

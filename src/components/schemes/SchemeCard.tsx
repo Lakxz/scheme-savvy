@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Scheme } from '@/types/database';
 import { getDaysUntilExpiry, getExpiryStatus } from '@/lib/eligibility-engine';
-import { Calendar, Building2, FileText, ExternalLink, Clock } from 'lucide-react';
+import { Building2, FileText, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -14,9 +14,15 @@ interface SchemeCardProps {
 }
 
 export function SchemeCard({ scheme, eligibilityScore, showEligibility = false }: SchemeCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const daysUntilExpiry = getDaysUntilExpiry(scheme.application_deadline);
   const expiryStatus = getExpiryStatus(daysUntilExpiry);
+
+  const isTa = language === 'ta';
+  const displayName = (isTa && scheme.name_ta) ? scheme.name_ta : scheme.name;
+  const displayMinistry = (isTa && scheme.ministry_ta) ? scheme.ministry_ta : scheme.ministry;
+  const displayDescription = (isTa && scheme.description_ta) ? scheme.description_ta : scheme.description;
+  const displayBenefits = (isTa && scheme.benefits_ta) ? scheme.benefits_ta : scheme.benefits;
 
   const getExpiryBadge = () => {
     switch (expiryStatus) {
@@ -38,10 +44,10 @@ export function SchemeCard({ scheme, eligibilityScore, showEligibility = false }
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1 flex-1">
-            <CardTitle className="text-lg leading-tight">{scheme.name}</CardTitle>
+            <CardTitle className="text-lg leading-tight">{displayName}</CardTitle>
             <CardDescription className="flex items-center gap-1 text-xs">
               <Building2 className="h-3 w-3" />
-              {scheme.ministry}
+              {displayMinistry}
             </CardDescription>
           </div>
           {showEligibility && eligibilityScore !== undefined && (
@@ -56,12 +62,12 @@ export function SchemeCard({ scheme, eligibilityScore, showEligibility = false }
       </CardHeader>
 
       <CardContent className="flex-1 flex flex-col gap-4">
-        <p className="text-sm text-muted-foreground line-clamp-2">{scheme.description}</p>
+        <p className="text-sm text-muted-foreground line-clamp-2">{displayDescription}</p>
 
-        {scheme.benefits && (
+        {displayBenefits && (
           <div className="bg-muted/50 p-3 text-sm">
             <p className="font-medium text-xs text-muted-foreground mb-1">{t('card.benefits')}</p>
-            <p className="line-clamp-2">{scheme.benefits}</p>
+            <p className="line-clamp-2">{displayBenefits}</p>
           </div>
         )}
 

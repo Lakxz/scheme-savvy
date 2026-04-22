@@ -50,19 +50,19 @@ export const translations = {
   'schemes.aiSuccess': { en: 'new schemes fetched using AI', ta: 'புதிய திட்டங்கள் AI மூலம் பெறப்பட்டன' },
   'schemes.aiError': { en: 'Failed to fetch schemes with AI', ta: 'AI மூலம் திட்டங்களைப் பெற முடியவில்லை' },
 
-  // State schemes page
-  'state.title': { en: 'State Government Schemes', ta: 'மாநில அரசு திட்டங்கள்' },
+  // State schemes page (Tamil Nadu only)
+  'state.title': { en: 'Tamil Nadu Government Schemes', ta: 'தமிழ்நாடு அரசு திட்டங்கள்' },
   'state.subtitle': {
-    en: 'Browse welfare schemes and scholarships offered by Indian state governments',
-    ta: 'இந்திய மாநில அரசுகள் வழங்கும் நலத் திட்டங்கள் மற்றும் உதவித்தொகைகளை உலாவவும்',
+    en: 'Browse welfare schemes and scholarships offered by the Government of Tamil Nadu',
+    ta: 'தமிழ்நாடு அரசு வழங்கும் நலத் திட்டங்கள் மற்றும் உதவித்தொகைகளை உலாவவும்',
   },
   'state.filterState': { en: 'Filter by state', ta: 'மாநிலம் மூலம் வடிகட்டு' },
   'state.searchPlaceholder': {
-    en: 'Search state schemes by name, state, or benefits...',
-    ta: 'பெயர், மாநிலம் அல்லது நன்மைகள் மூலம் தேடு...',
+    en: 'Search Tamil Nadu schemes by name, ministry, or benefits...',
+    ta: 'பெயர், அமைச்சகம் அல்லது நன்மைகள் மூலம் திட்டங்களைத் தேடு...',
   },
-  'state.fetchAI': { en: 'Fetch State Schemes with AI', ta: 'மாநில திட்டங்களை AI மூலம் பெறு' },
-  'state.noResults': { en: 'No state schemes found. Try fetching with AI.', ta: 'மாநில திட்டங்கள் இல்லை. AI மூலம் பெறவும்.' },
+  'state.fetchAI': { en: 'Fetch Tamil Nadu Schemes with AI', ta: 'தமிழ்நாடு திட்டங்களை AI மூலம் பெறு' },
+  'state.noResults': { en: 'No Tamil Nadu schemes found. Try fetching with AI.', ta: 'தமிழ்நாடு திட்டங்கள் இல்லை. AI மூலம் பெறவும்.' },
 
   // Scheme card
   'card.benefits': { en: 'Benefits:', ta: 'நன்மைகள்:' },

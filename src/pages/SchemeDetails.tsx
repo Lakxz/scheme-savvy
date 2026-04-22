@@ -95,7 +95,7 @@ export default function SchemeDetails() {
           <div className="lg:col-span-2 space-y-6">
             <div>
               <div className="flex items-start justify-between gap-4 mb-4">
-                <h1 className="text-3xl font-bold">{scheme.name}</h1>
+                <h1 className="text-3xl font-bold">{(language === 'ta' && scheme.name_ta) ? scheme.name_ta : scheme.name}</h1>
                 {expiryStatus === 'expired' ? (
                   <Badge variant="destructive">{t('card.expired')}</Badge>
                 ) : expiryStatus === 'urgent' ? (
@@ -113,10 +113,10 @@ export default function SchemeDetails() {
 
               <div className="flex items-center gap-2 text-muted-foreground mb-4">
                 <Building2 className="h-4 w-4" />
-                <span>{scheme.ministry}</span>
+                <span>{(language === 'ta' && scheme.ministry_ta) ? scheme.ministry_ta : scheme.ministry}</span>
               </div>
 
-              <p className="text-lg">{scheme.description}</p>
+              <p className="text-lg">{(language === 'ta' && scheme.description_ta) ? scheme.description_ta : scheme.description}</p>
             </div>
 
             {scheme.benefits && (
@@ -125,7 +125,7 @@ export default function SchemeDetails() {
                   <CardTitle className="text-lg">{t('details.benefits')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p>{scheme.benefits}</p>
+                  <p>{(language === 'ta' && scheme.benefits_ta) ? scheme.benefits_ta : scheme.benefits}</p>
                 </CardContent>
               </Card>
             )}

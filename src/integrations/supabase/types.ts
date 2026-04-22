@@ -149,10 +149,12 @@ export type Database = {
           application_deadline: string | null
           application_url: string | null
           benefits: string | null
+          benefits_ta: string | null
           bpl_only: boolean | null
           categories: Database["public"]["Enums"]["category_type"][] | null
           created_at: string | null
           description: string | null
+          description_ta: string | null
           disabilities: Database["public"]["Enums"]["disability_type"][] | null
           documents_required: string[] | null
           education_levels:
@@ -165,8 +167,10 @@ export type Database = {
           max_income: number | null
           min_age: number | null
           ministry: string
+          ministry_ta: string | null
           minority_only: boolean | null
           name: string
+          name_ta: string | null
           occupations: Database["public"]["Enums"]["occupation_type"][] | null
           scheme_level: Database["public"]["Enums"]["scheme_level"]
           states: string[] | null
@@ -176,10 +180,12 @@ export type Database = {
           application_deadline?: string | null
           application_url?: string | null
           benefits?: string | null
+          benefits_ta?: string | null
           bpl_only?: boolean | null
           categories?: Database["public"]["Enums"]["category_type"][] | null
           created_at?: string | null
           description?: string | null
+          description_ta?: string | null
           disabilities?: Database["public"]["Enums"]["disability_type"][] | null
           documents_required?: string[] | null
           education_levels?:
@@ -192,8 +198,10 @@ export type Database = {
           max_income?: number | null
           min_age?: number | null
           ministry: string
+          ministry_ta?: string | null
           minority_only?: boolean | null
           name: string
+          name_ta?: string | null
           occupations?: Database["public"]["Enums"]["occupation_type"][] | null
           scheme_level?: Database["public"]["Enums"]["scheme_level"]
           states?: string[] | null
@@ -203,10 +211,12 @@ export type Database = {
           application_deadline?: string | null
           application_url?: string | null
           benefits?: string | null
+          benefits_ta?: string | null
           bpl_only?: boolean | null
           categories?: Database["public"]["Enums"]["category_type"][] | null
           created_at?: string | null
           description?: string | null
+          description_ta?: string | null
           disabilities?: Database["public"]["Enums"]["disability_type"][] | null
           documents_required?: string[] | null
           education_levels?:
@@ -219,8 +229,10 @@ export type Database = {
           max_income?: number | null
           min_age?: number | null
           ministry?: string
+          ministry_ta?: string | null
           minority_only?: boolean | null
           name?: string
+          name_ta?: string | null
           occupations?: Database["public"]["Enums"]["occupation_type"][] | null
           scheme_level?: Database["public"]["Enums"]["scheme_level"]
           states?: string[] | null
