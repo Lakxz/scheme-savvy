@@ -73,12 +73,19 @@ export interface Notification {
   created_at: string;
 }
 
+export interface EligibilityItem {
+  code: string;
+  params?: Record<string, string | number>;
+}
+
 export interface EligibilityResult {
   scheme: Scheme;
   isEligible: boolean;
   confidenceScore: number;
   reasons: string[];
   missingCriteria: string[];
+  reasonItems: EligibilityItem[];
+  missingItems: EligibilityItem[];
 }
 
 export const INDIAN_STATES = [
