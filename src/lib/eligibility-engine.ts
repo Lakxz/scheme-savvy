@@ -1,25 +1,40 @@
-import { Profile, Scheme, EligibilityResult } from '@/types/database';
+import { Profile, Scheme, EligibilityResult, EligibilityItem } from '@/types/database';
 
 export function calculateEligibility(profile: Partial<Profile>, scheme: Scheme): EligibilityResult {
   const reasons: string[] = [];
   const missingCriteria: string[] = [];
+  const reasonItems: EligibilityItem[] = [];
+  const missingItems: EligibilityItem[] = [];
   let matchScore = 0;
   let totalCriteria = 0;
+
+  const addReason = (text: string, code: string, params?: Record<string, string | number>) => {
+    reasons.push(text);
+    reasonItems.push({ code, params });
+  };
+  const addMissing = (text: string, code: string, params?: Record<string, string | number>) => {
+    missingCriteria.push(text);
+    missingItems.push({ code, params });
+  };
 
   // Age check
   if (scheme.min_age !== null || scheme.max_age !== null) {
     totalCriteria++;
+    const minAge = scheme.min_age ?? 0;
+    const maxAge = scheme.max_age ?? 150;
     if (profile.age !== null && profile.age !== undefined) {
-      const minAge = scheme.min_age ?? 0;
-      const maxAge = scheme.max_age ?? 150;
       if (profile.age >= minAge && profile.age <= maxAge) {
         matchScore++;
-        reasons.push(`Age ${profile.age} is within eligible range (${minAge}-${maxAge} years)`);
+        addReason(
+          `Age ${profile.age} is within eligible range (${minAge}-${maxAge} years)`,
+          'reason.ageOk',
+          { age: profile.age, min: minAge, max: maxAge }
+        );
       } else {
-        missingCriteria.push(`Age must be between ${minAge} and ${maxAge} years`);
+        addMissing(`Age must be between ${minAge} and ${maxAge} years`, 'missing.ageRange', { min: minAge, max: maxAge });
       }
     } else {
-      missingCriteria.push('Age information required');
+      addMissing('Age information required', 'missing.ageRequired');
     }
   }
 
@@ -29,12 +44,12 @@ export function calculateEligibility(profile: Partial<Profile>, scheme: Scheme):
     if (profile.gender) {
       if (scheme.gender.includes(profile.gender)) {
         matchScore++;
-        reasons.push(`Gender (${profile.gender}) is eligible`);
+        addReason(`Gender (${profile.gender}) is eligible`, 'reason.genderOk', { value: profile.gender });
       } else {
-        missingCriteria.push(`This scheme is for ${scheme.gender.join('/')} only`);
+        addMissing(`This scheme is for ${scheme.gender.join('/')} only`, 'missing.genderOnly', { values: scheme.gender.join('/') });
       }
     } else {
-      missingCriteria.push('Gender information required');
+      addMissing('Gender information required', 'missing.genderRequired');
     }
   }
 
@@ -44,12 +59,16 @@ export function calculateEligibility(profile: Partial<Profile>, scheme: Scheme):
     if (profile.category) {
       if (scheme.categories.includes(profile.category)) {
         matchScore++;
-        reasons.push(`Category (${profile.category.toUpperCase()}) is eligible`);
+        addReason(`Category (${profile.category.toUpperCase()}) is eligible`, 'reason.categoryOk', { value: profile.category });
       } else {
-        missingCriteria.push(`This scheme is for ${scheme.categories.map(c => c.toUpperCase()).join('/')} categories`);
+        addMissing(
+          `This scheme is for ${scheme.categories.map(c => c.toUpperCase()).join('/')} categories`,
+          'missing.categoryOnly',
+          { values: scheme.categories.join('/') }
+        );
       }
     } else {
-      missingCriteria.push('Category information required');
+      addMissing('Category information required', 'missing.categoryRequired');
     }
   }
 
@@ -59,12 +78,12 @@ export function calculateEligibility(profile: Partial<Profile>, scheme: Scheme):
     if (profile.occupation) {
       if (scheme.occupations.includes(profile.occupation)) {
         matchScore++;
-        reasons.push(`Occupation (${profile.occupation.replace('_', ' ')}) is eligible`);
+        addReason(`Occupation (${profile.occupation.replace('_', ' ')}) is eligible`, 'reason.occupationOk', { value: profile.occupation });
       } else {
-        missingCriteria.push(`This scheme requires occupation: ${scheme.occupations.join(', ')}`);
+        addMissing(`This scheme requires occupation: ${scheme.occupations.join(', ')}`, 'missing.occupationOnly', { values: scheme.occupations.join(',') });
       }
     } else {
-      missingCriteria.push('Occupation information required');
+      addMissing('Occupation information required', 'missing.occupationRequired');
     }
   }
 
@@ -74,12 +93,12 @@ export function calculateEligibility(profile: Partial<Profile>, scheme: Scheme):
     if (profile.education) {
       if (scheme.education_levels.includes(profile.education)) {
         matchScore++;
-        reasons.push(`Education level (${profile.education.replace('_', ' ')}) is eligible`);
+        addReason(`Education level (${profile.education.replace('_', ' ')}) is eligible`, 'reason.educationOk', { value: profile.education });
       } else {
-        missingCriteria.push(`This scheme requires education: ${scheme.education_levels.join(', ')}`);
+        addMissing(`This scheme requires education: ${scheme.education_levels.join(', ')}`, 'missing.educationOnly', { values: scheme.education_levels.join(',') });
       }
     } else {
-      missingCriteria.push('Education information required');
+      addMissing('Education information required', 'missing.educationRequired');
     }
   }
 
@@ -89,12 +108,12 @@ export function calculateEligibility(profile: Partial<Profile>, scheme: Scheme):
     if (profile.disability && profile.disability !== 'none') {
       if (scheme.disabilities.includes(profile.disability)) {
         matchScore++;
-        reasons.push(`Disability status qualifies for this scheme`);
+        addReason('Disability status qualifies for this scheme', 'reason.disabilityOk');
       } else {
-        missingCriteria.push(`This scheme is for ${scheme.disabilities.join('/')} disabilities`);
+        addMissing(`This scheme is for ${scheme.disabilities.join('/')} disabilities`, 'missing.disabilityOnly', { values: scheme.disabilities.join('/') });
       }
     } else {
-      missingCriteria.push('This scheme requires disability status');
+      addMissing('This scheme requires disability status', 'missing.disabilityRequired');
     }
   }
 
@@ -104,12 +123,16 @@ export function calculateEligibility(profile: Partial<Profile>, scheme: Scheme):
     if (profile.annual_income !== undefined) {
       if (profile.annual_income <= scheme.max_income) {
         matchScore++;
-        reasons.push(`Annual income ₹${profile.annual_income.toLocaleString()} is within limit (₹${scheme.max_income.toLocaleString()})`);
+        addReason(
+          `Annual income ₹${profile.annual_income.toLocaleString()} is within limit (₹${scheme.max_income.toLocaleString()})`,
+          'reason.incomeOk',
+          { income: profile.annual_income, max: scheme.max_income }
+        );
       } else {
-        missingCriteria.push(`Annual income must be below ₹${scheme.max_income.toLocaleString()}`);
+        addMissing(`Annual income must be below ₹${scheme.max_income.toLocaleString()}`, 'missing.incomeOver', { max: scheme.max_income });
       }
     } else {
-      missingCriteria.push('Income information required');
+      addMissing('Income information required', 'missing.incomeRequired');
     }
   }
 
@@ -119,12 +142,12 @@ export function calculateEligibility(profile: Partial<Profile>, scheme: Scheme):
     if (profile.state) {
       if (scheme.states.includes(profile.state)) {
         matchScore++;
-        reasons.push(`Resident of ${profile.state} is eligible`);
+        addReason(`Resident of ${profile.state} is eligible`, 'reason.stateOk', { value: profile.state });
       } else {
-        missingCriteria.push(`This scheme is for ${scheme.states.join(', ')} residents only`);
+        addMissing(`This scheme is for ${scheme.states.join(', ')} residents only`, 'missing.stateOnly', { values: scheme.states.join(', ') });
       }
     } else {
-      missingCriteria.push('State information required');
+      addMissing('State information required', 'missing.stateRequired');
     }
   }
 
@@ -133,9 +156,9 @@ export function calculateEligibility(profile: Partial<Profile>, scheme: Scheme):
     totalCriteria++;
     if (profile.is_bpl) {
       matchScore++;
-      reasons.push('BPL status qualifies for this scheme');
+      addReason('BPL status qualifies for this scheme', 'reason.bplOk');
     } else {
-      missingCriteria.push('This scheme is for BPL families only');
+      addMissing('This scheme is for BPL families only', 'missing.bplOnly');
     }
   }
 
@@ -144,9 +167,9 @@ export function calculateEligibility(profile: Partial<Profile>, scheme: Scheme):
     totalCriteria++;
     if (profile.is_minority) {
       matchScore++;
-      reasons.push('Minority status qualifies for this scheme');
+      addReason('Minority status qualifies for this scheme', 'reason.minorityOk');
     } else {
-      missingCriteria.push('This scheme is for minority communities only');
+      addMissing('This scheme is for minority communities only', 'missing.minorityOnly');
     }
   }
 
@@ -159,6 +182,8 @@ export function calculateEligibility(profile: Partial<Profile>, scheme: Scheme):
     confidenceScore,
     reasons,
     missingCriteria,
+    reasonItems,
+    missingItems,
   };
 }
 
