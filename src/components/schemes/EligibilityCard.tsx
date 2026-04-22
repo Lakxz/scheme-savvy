@@ -7,15 +7,20 @@ import { CheckCircle2, XCircle, AlertCircle, Clock, ExternalLink, ChevronDown, C
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { translateEligibilityItem } from '@/lib/i18n-helpers';
 
 interface EligibilityCardProps {
   result: EligibilityResult;
 }
 
 export function EligibilityCard({ result }: EligibilityCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [expanded, setExpanded] = useState(false);
-  const { scheme, isEligible, confidenceScore, reasons, missingCriteria } = result;
+  const { scheme, isEligible, confidenceScore, reasonItems, missingItems } = result;
+  const isTa = language === 'ta';
+  const displayName = (isTa && scheme.name_ta) ? scheme.name_ta : scheme.name;
+  const displayMinistry = (isTa && scheme.ministry_ta) ? scheme.ministry_ta : scheme.ministry;
+  const displayBenefits = (isTa && scheme.benefits_ta) ? scheme.benefits_ta : scheme.benefits;
 
   const daysUntilExpiry = getDaysUntilExpiry(scheme.application_deadline);
   const expiryStatus = getExpiryStatus(daysUntilExpiry);
@@ -47,8 +52,8 @@ export function EligibilityCard({ result }: EligibilityCardProps) {
           <div className="flex items-start gap-3 flex-1">
             {getStatusIcon()}
             <div className="space-y-1">
-              <CardTitle className="text-base leading-tight">{scheme.name}</CardTitle>
-              <p className="text-xs text-muted-foreground">{scheme.ministry}</p>
+              <CardTitle className="text-base leading-tight">{displayName}</CardTitle>
+              <p className="text-xs text-muted-foreground">{displayMinistry}</p>
             </div>
           </div>
           <div className="flex flex-col items-end gap-2">
@@ -82,38 +87,38 @@ export function EligibilityCard({ result }: EligibilityCardProps) {
 
         {expanded && (
           <div className="space-y-3 pt-2 border-t border-border">
-            {reasons.length > 0 && (
+            {reasonItems.length > 0 && (
               <div>
                 <p className="text-xs font-medium text-emerald-600 mb-2">{t('elig.qualify')}</p>
                 <ul className="space-y-1">
-                  {reasons.map((reason, i) => (
+                  {reasonItems.map((item, i) => (
                     <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
                       <CheckCircle2 className="h-3 w-3 text-emerald-500 mt-0.5 flex-shrink-0" />
-                      {reason}
+                      {translateEligibilityItem(item, language)}
                     </li>
                   ))}
                 </ul>
               </div>
             )}
 
-            {missingCriteria.length > 0 && (
+            {missingItems.length > 0 && (
               <div>
                 <p className="text-xs font-medium text-amber-600 mb-2">{t('elig.missing')}</p>
                 <ul className="space-y-1">
-                  {missingCriteria.map((criteria, i) => (
+                  {missingItems.map((item, i) => (
                     <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
                       <XCircle className="h-3 w-3 text-amber-500 mt-0.5 flex-shrink-0" />
-                      {criteria}
+                      {translateEligibilityItem(item, language)}
                     </li>
                   ))}
                 </ul>
               </div>
             )}
 
-            {scheme.benefits && (
+            {displayBenefits && (
               <div className="bg-muted/50 p-3">
                 <p className="text-xs font-medium mb-1">{t('card.benefits')}</p>
-                <p className="text-xs text-muted-foreground">{scheme.benefits}</p>
+                <p className="text-xs text-muted-foreground">{displayBenefits}</p>
               </div>
             )}
           </div>
