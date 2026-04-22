@@ -27,9 +27,13 @@ export interface Profile {
 export interface Scheme {
   id: string;
   name: string;
+  name_ta: string | null;
   description: string | null;
+  description_ta: string | null;
   ministry: string;
+  ministry_ta: string | null;
   benefits: string | null;
+  benefits_ta: string | null;
   documents_required: string[] | null;
   application_url: string | null;
   application_deadline: string | null;
