@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, ArrowLeft, ExternalLink, Calendar, Building2, FileText, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { translateEligibilityItem, translateEnumList, translateDocument } from '@/lib/i18n-helpers';
 
 export default function SchemeDetails() {
   const { t, language } = useLanguage();
@@ -143,7 +144,7 @@ export default function SchemeDetails() {
                     {scheme.documents_required.map((doc, i) => (
                       <li key={i} className="flex items-center gap-2">
                         <div className="h-2 w-2 bg-primary" />
-                        {doc}
+                        {translateDocument(doc, language)}
                       </li>
                     ))}
                   </ul>
@@ -166,21 +167,21 @@ export default function SchemeDetails() {
                 {scheme.gender && scheme.gender.length > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('profile.gender')}</span>
-                    <span className="capitalize">{scheme.gender.join(', ')}</span>
+                    <span>{translateEnumList('gender', scheme.gender, language, ', ')}</span>
                   </div>
                 )}
 
                 {scheme.categories && scheme.categories.length > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('profile.category')}</span>
-                    <span className="uppercase">{scheme.categories.join(', ')}</span>
+                    <span>{translateEnumList('category', scheme.categories, language, ', ')}</span>
                   </div>
                 )}
 
                 {scheme.max_income !== null && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('details.maxIncome')}</span>
-                    <span>₹{scheme.max_income.toLocaleString()}</span>
+                    <span>₹{scheme.max_income.toLocaleString(language === 'ta' ? 'ta-IN' : 'en-IN')}</span>
                   </div>
                 )}
 
@@ -224,28 +225,28 @@ export default function SchemeDetails() {
                     <p className="text-sm text-muted-foreground">{t('details.matchScore')}</p>
                   </div>
 
-                  {eligibility.reasons.length > 0 && (
+                  {eligibility.reasonItems.length > 0 && (
                     <div>
                       <p className="text-xs font-medium text-primary mb-2">{t('details.qualifyBecause')}</p>
                       <ul className="space-y-1">
-                        {eligibility.reasons.slice(0, 3).map((reason, i) => (
+                        {eligibility.reasonItems.slice(0, 3).map((item, i) => (
                           <li key={i} className="text-xs text-muted-foreground flex gap-2">
                             <CheckCircle2 className="h-3 w-3 text-primary mt-0.5 flex-shrink-0" />
-                            {reason}
+                            {translateEligibilityItem(item, language)}
                           </li>
                         ))}
                       </ul>
                     </div>
                   )}
 
-                  {eligibility.missingCriteria.length > 0 && (
+                  {eligibility.missingItems.length > 0 && (
                     <div>
                       <p className="text-xs font-medium text-amber-600 mb-2">{t('details.missing')}</p>
                       <ul className="space-y-1">
-                        {eligibility.missingCriteria.slice(0, 3).map((criteria, i) => (
+                        {eligibility.missingItems.slice(0, 3).map((item, i) => (
                           <li key={i} className="text-xs text-muted-foreground flex gap-2">
                             <XCircle className="h-3 w-3 text-amber-500 mt-0.5 flex-shrink-0" />
-                            {criteria}
+                            {translateEligibilityItem(item, language)}
                           </li>
                         ))}
                       </ul>
