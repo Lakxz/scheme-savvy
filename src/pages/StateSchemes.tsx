@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Scheme, INDIAN_STATES } from '@/types/database';
+import { Scheme } from '@/types/database';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { SchemeCard } from '@/components/schemes/SchemeCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Pagination,
   PaginationContent,
@@ -16,7 +15,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { Loader2, Search, Filter, Sparkles, MapPin } from 'lucide-react';
+import { Loader2, Search, Sparkles, MapPin } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -28,7 +27,6 @@ export default function StateSchemesPage() {
   const [schemes, setSchemes] = useState<Scheme[]>([]);
   const [filteredSchemes, setFilteredSchemes] = useState<Scheme[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [stateFilter, setStateFilter] = useState<string>('all');
   const [fetching, setFetching] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
@@ -39,7 +37,7 @@ export default function StateSchemesPage() {
 
   useEffect(() => {
     filterSchemes();
-  }, [schemes, searchQuery, stateFilter]);
+  }, [schemes, searchQuery]);
 
   const fetchSchemes = async () => {
     try {
@@ -48,12 +46,13 @@ export default function StateSchemesPage() {
         .select('*')
         .eq('is_active', true)
         .eq('scheme_level', 'state')
+        .contains('states', ['Tamil Nadu'])
         .order('application_deadline', { ascending: true });
 
       if (error) throw error;
       setSchemes((data as Scheme[]) || []);
     } catch (error) {
-      console.error('Error fetching state schemes:', error);
+      console.error('Error fetching Tamil Nadu schemes:', error);
     } finally {
       setLoading(false);
     }
@@ -67,15 +66,14 @@ export default function StateSchemesPage() {
       filtered = filtered.filter(
         (s) =>
           s.name.toLowerCase().includes(query) ||
+          s.name_ta?.toLowerCase().includes(query) ||
           s.description?.toLowerCase().includes(query) ||
+          s.description_ta?.toLowerCase().includes(query) ||
           s.ministry.toLowerCase().includes(query) ||
+          s.ministry_ta?.toLowerCase().includes(query) ||
           s.benefits?.toLowerCase().includes(query) ||
-          s.states?.some((st) => st.toLowerCase().includes(query))
+          s.benefits_ta?.toLowerCase().includes(query)
       );
-    }
-
-    if (stateFilter !== 'all') {
-      filtered = filtered.filter((s) => s.states?.includes(stateFilter));
     }
 
     setFilteredSchemes(filtered);
@@ -104,11 +102,6 @@ export default function StateSchemesPage() {
       setFetching(false);
     }
   };
-
-  // Available states from data
-  const availableStates = Array.from(
-    new Set(schemes.flatMap((s) => s.states || []))
-  ).sort();
 
   const totalPages = Math.ceil(filteredSchemes.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -143,8 +136,8 @@ export default function StateSchemesPage() {
           </Button>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          <div className="relative flex-1">
+        <div className="mb-8">
+          <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={t('state.searchPlaceholder')}
@@ -152,22 +145,6 @@ export default function StateSchemesPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
             />
-          </div>
-          <div className="w-full md:w-64">
-            <Select value={stateFilter} onValueChange={setStateFilter}>
-              <SelectTrigger>
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder={t('state.filterState')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t('common.allStates')}</SelectItem>
-                {(availableStates.length > 0 ? availableStates : INDIAN_STATES).map((state) => (
-                  <SelectItem key={state} value={state}>
-                    {state}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
         </div>
 
