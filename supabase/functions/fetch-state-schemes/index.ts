@@ -20,16 +20,24 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const prompt = `Generate a JSON array of 25 real STATE GOVERNMENT schemes from various Indian states (Tamil Nadu, Karnataka, Kerala, Maharashtra, Gujarat, Rajasthan, Andhra Pradesh, Telangana, West Bengal, Punjab, Uttar Pradesh, Bihar, Odisha, Madhya Pradesh, etc.). Cover scholarships, farmer welfare, women empowerment, housing, health, pension, and skill schemes. Return strict JSON in this exact format:
+    const prompt = `Generate a JSON array of 25 real TAMIL NADU state government schemes ONLY. Cover scholarships (Pudhumai Penn, Tamil Pudhalvan), women welfare (Kalaignar Magalir Urimai Thogai), farmer schemes, housing, health (CMCHIS), pension, skill, and education schemes from Tamil Nadu government departments.
+
+Each scheme MUST include BOTH English and Tamil text for: name, description, ministry, benefits.
+
+Return strict JSON in this exact format:
 
 [
   {
-    "name": "Scheme Name",
-    "description": "2-3 sentence description",
-    "ministry": "State Department / Ministry name (include state name)",
-    "benefits": "What beneficiaries receive",
+    "name": "Scheme Name in English",
+    "name_ta": "திட்டத்தின் பெயர் தமிழில்",
+    "description": "2-3 sentence description in English",
+    "description_ta": "2-3 வாக்கியங்களில் தமிழில் விளக்கம்",
+    "ministry": "Tamil Nadu Department / Ministry name in English",
+    "ministry_ta": "தமிழ்நாடு துறை / அமைச்சகத்தின் பெயர் தமிழில்",
+    "benefits": "What beneficiaries receive in English",
+    "benefits_ta": "பயனாளிகள் பெறுவது தமிழில்",
     "documents_required": ["Aadhaar Card", "Income Certificate"],
-    "application_url": "https://official-state-portal.gov.in",
+    "application_url": "https://official-tn-portal.tn.gov.in",
     "application_deadline": "2026-08-30",
     "min_age": 18,
     "max_age": 35,
@@ -46,15 +54,15 @@ serve(async (req) => {
 ]
 
 STRICT RULES:
-- Every scheme MUST have a non-empty "states" array with at least one Indian state name (since these are state schemes).
+- Every scheme MUST have "states": ["Tamil Nadu"] (ONLY Tamil Nadu, no other state).
+- Every scheme MUST include name_ta, description_ta, ministry_ta, benefits_ta in proper Tamil script (தமிழ்).
 - Use ONLY these gender values: "male", "female", "other"
 - Use ONLY these category values: "general", "obc", "sc", "st", "ews"
 - Use ONLY these occupation values: "student", "employed", "self_employed", "unemployed", "farmer", "retired", "homemaker"
 - Use ONLY these education values: "none", "primary", "secondary", "higher_secondary", "graduate", "postgraduate", "doctorate"
 - Use ONLY these disability values: "none", "visual", "hearing", "locomotor", "mental", "multiple"
 - application_deadline must be a future date in 2026
-- Use real schemes like Tamil Nadu Pudhumai Penn, Kalaignar Magalir Urimai Thogai, Karnataka Gruha Lakshmi, Kerala Snehapoorvam, Mahatma Jyotirao Phule Jan Arogya Yojana, Mukhyamantri Ladli Behna, etc.
-- Cover at least 10 different states
+- Use real TN schemes: Pudhumai Penn, Tamil Pudhalvan, Kalaignar Magalir Urimai Thogai, Moovalur Ramamirtham Ammaiyar Higher Education Assurance, CMCHIS, Naan Mudhalvan, Ungaludan Stalin, Kalaignar Kanavu Illam, etc.
 - Return ONLY the JSON array, no markdown, no extra text.`;
 
     const response = await fetch(
@@ -66,12 +74,12 @@ STRICT RULES:
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
+          model: "google/gemini-2.5-flash",
           messages: [
             {
               role: "system",
               content:
-                "You are a database of Indian STATE government schemes. Return only valid JSON arrays with accurate state-specific scheme data. No markdown, no code blocks.",
+                "You are a database of Tamil Nadu state government schemes. Return only valid JSON arrays with accurate scheme data including proper Tamil translations. No markdown, no code blocks.",
             },
             { role: "user", content: prompt },
           ],
@@ -113,7 +121,6 @@ STRICT RULES:
       throw new Error("AI returned invalid scheme data");
     }
 
-    // Allowed enum values — drop anything else to avoid Postgres enum errors
     const ALLOWED_GENDER = new Set(["male", "female", "other"]);
     const ALLOWED_CATEGORY = new Set(["general", "obc", "sc", "st", "ews"]);
     const ALLOWED_OCCUPATION = new Set([
@@ -136,9 +143,13 @@ STRICT RULES:
 
     const schemesToInsert = schemes.map((s: any) => ({
       name: s.name,
+      name_ta: s.name_ta || null,
       description: s.description,
+      description_ta: s.description_ta || null,
       ministry: s.ministry,
+      ministry_ta: s.ministry_ta || null,
       benefits: s.benefits,
+      benefits_ta: s.benefits_ta || null,
       documents_required: Array.isArray(s.documents_required) ? s.documents_required : null,
       application_url: s.application_url,
       application_deadline: s.application_deadline,
@@ -150,7 +161,7 @@ STRICT RULES:
       education_levels: cleanArr(s.education_levels, ALLOWED_EDUCATION),
       disabilities: cleanArr(s.disabilities, ALLOWED_DISABILITY),
       max_income: s.max_income,
-      states: Array.isArray(s.states) && s.states.length > 0 ? s.states : null,
+      states: ["Tamil Nadu"],
       bpl_only: s.bpl_only || false,
       minority_only: s.minority_only || false,
       is_active: true,
@@ -170,7 +181,7 @@ STRICT RULES:
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Successfully fetched ${inserted?.length || 0} state schemes`,
+        message: `Successfully fetched ${inserted?.length || 0} Tamil Nadu schemes`,
         count: inserted?.length || 0,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
