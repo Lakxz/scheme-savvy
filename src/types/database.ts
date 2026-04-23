@@ -4,6 +4,10 @@ export type OccupationType = 'student' | 'employed' | 'self_employed' | 'unemplo
 export type EducationType = 'none' | 'primary' | 'secondary' | 'higher_secondary' | 'graduate' | 'postgraduate' | 'doctorate';
 export type DisabilityType = 'none' | 'visual' | 'hearing' | 'locomotor' | 'mental' | 'multiple';
 export type AppRole = 'user' | 'admin';
+export type MaritalStatus = 'single' | 'married' | 'widowed' | 'divorced' | 'separated';
+export type FarmerType = 'landless' | 'marginal' | 'small' | 'medium' | 'large';
+export type RationCardType = 'none' | 'apl' | 'bpl' | 'aay' | 'priority';
+export type ApplicationStatus = 'interested' | 'applied' | 'approved' | 'rejected';
 
 export interface Profile {
   id: string;
@@ -20,6 +24,17 @@ export interface Profile {
   district: string | null;
   is_bpl: boolean;
   is_minority: boolean;
+  // New fields
+  marital_status: MaritalStatus | null;
+  dependents: number;
+  religion: string | null;
+  sub_caste: string | null;
+  land_acres: number;
+  farmer_type: FarmerType | null;
+  has_bank_account: boolean;
+  has_aadhaar: boolean;
+  ration_card: RationCardType;
+  email_alerts: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -49,6 +64,15 @@ export interface Scheme {
   bpl_only: boolean;
   minority_only: boolean;
   is_active: boolean;
+  // New matching fields
+  marital_statuses: MaritalStatus[] | null;
+  religions: string[] | null;
+  farmer_types: FarmerType[] | null;
+  max_land_acres: number | null;
+  requires_bank_account: boolean;
+  requires_aadhaar: boolean;
+  ration_cards: RationCardType[] | null;
+  scheme_level?: 'central' | 'state';
   created_at: string;
   updated_at: string;
 }
@@ -57,7 +81,7 @@ export interface UserSchemeApplication {
   id: string;
   user_id: string;
   scheme_id: string;
-  status: 'interested' | 'applied' | 'approved' | 'rejected';
+  status: ApplicationStatus;
   applied_at: string | null;
   created_at: string;
 }
@@ -95,4 +119,8 @@ export const INDIAN_STATES = [
   'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
   'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
   'Delhi', 'Jammu & Kashmir', 'Ladakh', 'Puducherry', 'Chandigarh'
+];
+
+export const RELIGIONS = [
+  'Hindu', 'Muslim', 'Christian', 'Sikh', 'Buddhist', 'Jain', 'Parsi', 'Other'
 ];

@@ -93,16 +93,28 @@ export type Database = {
           annual_income: number | null
           category: Database["public"]["Enums"]["category_type"] | null
           created_at: string | null
+          dependents: number | null
           disability: Database["public"]["Enums"]["disability_type"] | null
           district: string | null
           education: Database["public"]["Enums"]["education_type"] | null
+          email_alerts: boolean | null
+          farmer_type: Database["public"]["Enums"]["farmer_type"] | null
           full_name: string | null
           gender: Database["public"]["Enums"]["gender_type"] | null
+          has_aadhaar: boolean | null
+          has_bank_account: boolean | null
           id: string
           is_bpl: boolean | null
           is_minority: boolean | null
+          land_acres: number | null
+          marital_status:
+            | Database["public"]["Enums"]["marital_status_type"]
+            | null
           occupation: Database["public"]["Enums"]["occupation_type"] | null
+          ration_card: Database["public"]["Enums"]["ration_card_type"] | null
+          religion: string | null
           state: string | null
+          sub_caste: string | null
           updated_at: string | null
           user_id: string
         }
@@ -111,16 +123,28 @@ export type Database = {
           annual_income?: number | null
           category?: Database["public"]["Enums"]["category_type"] | null
           created_at?: string | null
+          dependents?: number | null
           disability?: Database["public"]["Enums"]["disability_type"] | null
           district?: string | null
           education?: Database["public"]["Enums"]["education_type"] | null
+          email_alerts?: boolean | null
+          farmer_type?: Database["public"]["Enums"]["farmer_type"] | null
           full_name?: string | null
           gender?: Database["public"]["Enums"]["gender_type"] | null
+          has_aadhaar?: boolean | null
+          has_bank_account?: boolean | null
           id?: string
           is_bpl?: boolean | null
           is_minority?: boolean | null
+          land_acres?: number | null
+          marital_status?:
+            | Database["public"]["Enums"]["marital_status_type"]
+            | null
           occupation?: Database["public"]["Enums"]["occupation_type"] | null
+          ration_card?: Database["public"]["Enums"]["ration_card_type"] | null
+          religion?: string | null
           state?: string | null
+          sub_caste?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -129,16 +153,28 @@ export type Database = {
           annual_income?: number | null
           category?: Database["public"]["Enums"]["category_type"] | null
           created_at?: string | null
+          dependents?: number | null
           disability?: Database["public"]["Enums"]["disability_type"] | null
           district?: string | null
           education?: Database["public"]["Enums"]["education_type"] | null
+          email_alerts?: boolean | null
+          farmer_type?: Database["public"]["Enums"]["farmer_type"] | null
           full_name?: string | null
           gender?: Database["public"]["Enums"]["gender_type"] | null
+          has_aadhaar?: boolean | null
+          has_bank_account?: boolean | null
           id?: string
           is_bpl?: boolean | null
           is_minority?: boolean | null
+          land_acres?: number | null
+          marital_status?:
+            | Database["public"]["Enums"]["marital_status_type"]
+            | null
           occupation?: Database["public"]["Enums"]["occupation_type"] | null
+          ration_card?: Database["public"]["Enums"]["ration_card_type"] | null
+          religion?: string | null
           state?: string | null
+          sub_caste?: string | null
           updated_at?: string | null
           user_id?: string
         }
@@ -160,11 +196,16 @@ export type Database = {
           education_levels:
             | Database["public"]["Enums"]["education_type"][]
             | null
+          farmer_types: Database["public"]["Enums"]["farmer_type"][] | null
           gender: Database["public"]["Enums"]["gender_type"][] | null
           id: string
           is_active: boolean | null
+          marital_statuses:
+            | Database["public"]["Enums"]["marital_status_type"][]
+            | null
           max_age: number | null
           max_income: number | null
+          max_land_acres: number | null
           min_age: number | null
           ministry: string
           ministry_ta: string | null
@@ -172,6 +213,10 @@ export type Database = {
           name: string
           name_ta: string | null
           occupations: Database["public"]["Enums"]["occupation_type"][] | null
+          ration_cards: Database["public"]["Enums"]["ration_card_type"][] | null
+          religions: string[] | null
+          requires_aadhaar: boolean | null
+          requires_bank_account: boolean | null
           scheme_level: Database["public"]["Enums"]["scheme_level"]
           states: string[] | null
           updated_at: string | null
@@ -191,11 +236,16 @@ export type Database = {
           education_levels?:
             | Database["public"]["Enums"]["education_type"][]
             | null
+          farmer_types?: Database["public"]["Enums"]["farmer_type"][] | null
           gender?: Database["public"]["Enums"]["gender_type"][] | null
           id?: string
           is_active?: boolean | null
+          marital_statuses?:
+            | Database["public"]["Enums"]["marital_status_type"][]
+            | null
           max_age?: number | null
           max_income?: number | null
+          max_land_acres?: number | null
           min_age?: number | null
           ministry: string
           ministry_ta?: string | null
@@ -203,6 +253,12 @@ export type Database = {
           name: string
           name_ta?: string | null
           occupations?: Database["public"]["Enums"]["occupation_type"][] | null
+          ration_cards?:
+            | Database["public"]["Enums"]["ration_card_type"][]
+            | null
+          religions?: string[] | null
+          requires_aadhaar?: boolean | null
+          requires_bank_account?: boolean | null
           scheme_level?: Database["public"]["Enums"]["scheme_level"]
           states?: string[] | null
           updated_at?: string | null
@@ -222,11 +278,16 @@ export type Database = {
           education_levels?:
             | Database["public"]["Enums"]["education_type"][]
             | null
+          farmer_types?: Database["public"]["Enums"]["farmer_type"][] | null
           gender?: Database["public"]["Enums"]["gender_type"][] | null
           id?: string
           is_active?: boolean | null
+          marital_statuses?:
+            | Database["public"]["Enums"]["marital_status_type"][]
+            | null
           max_age?: number | null
           max_income?: number | null
+          max_land_acres?: number | null
           min_age?: number | null
           ministry?: string
           ministry_ta?: string | null
@@ -234,6 +295,12 @@ export type Database = {
           name?: string
           name_ta?: string | null
           occupations?: Database["public"]["Enums"]["occupation_type"][] | null
+          ration_cards?:
+            | Database["public"]["Enums"]["ration_card_type"][]
+            | null
+          religions?: string[] | null
+          requires_aadhaar?: boolean | null
+          requires_bank_account?: boolean | null
           scheme_level?: Database["public"]["Enums"]["scheme_level"]
           states?: string[] | null
           updated_at?: string | null
@@ -365,7 +432,14 @@ export type Database = {
         | "graduate"
         | "postgraduate"
         | "doctorate"
+      farmer_type: "landless" | "marginal" | "small" | "medium" | "large"
       gender_type: "male" | "female" | "other"
+      marital_status_type:
+        | "single"
+        | "married"
+        | "widowed"
+        | "divorced"
+        | "separated"
       occupation_type:
         | "student"
         | "employed"
@@ -374,6 +448,7 @@ export type Database = {
         | "farmer"
         | "retired"
         | "homemaker"
+      ration_card_type: "none" | "apl" | "bpl" | "aay" | "priority"
       scheme_level: "central" | "state"
     }
     CompositeTypes: {
@@ -521,7 +596,15 @@ export const Constants = {
         "postgraduate",
         "doctorate",
       ],
+      farmer_type: ["landless", "marginal", "small", "medium", "large"],
       gender_type: ["male", "female", "other"],
+      marital_status_type: [
+        "single",
+        "married",
+        "widowed",
+        "divorced",
+        "separated",
+      ],
       occupation_type: [
         "student",
         "employed",
@@ -531,6 +614,7 @@ export const Constants = {
         "retired",
         "homemaker",
       ],
+      ration_card_type: ["none", "apl", "bpl", "aay", "priority"],
       scheme_level: ["central", "state"],
     },
   },
