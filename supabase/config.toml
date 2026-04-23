@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.fetch-state-schemes]
 verify_jwt = false
+
+[functions.scheme-alerts-scan]
+verify_jwt = false
